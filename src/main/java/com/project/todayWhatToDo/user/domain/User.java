@@ -34,12 +34,15 @@ public class User {
     private String password;
     @Column
     private String name;
+    @Column
+    private String authority;
 
     @Builder
-    private User(String email, String nickname, String password, String name) {
+    private User(String email, String nickname, String password, String name, String authority) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
         this.name = name;
+        this.authority = authority;
     }
 }
