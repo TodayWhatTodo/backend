@@ -26,7 +26,7 @@ public class User {
     @Column
     @CreatedDate
     private LocalDateTime visitedAt;
-    @Column
+    @Column(unique = true)
     private String email;
     @Column
     private String nickname;

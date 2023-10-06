@@ -2,6 +2,7 @@ package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.repository.UserRepository;
+import com.project.todayWhatToDo.user.login.LoginApiManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -20,7 +21,7 @@ public class UserServiceTest {
 
     public UserServiceTest() {
         userRepository = Mockito.mock(UserRepository.class);
-        userService = new UserService(userRepository);
+        userService = new UserService(userRepository, new LoginApiManager());
     }
 
     @DisplayName("로그인 진행을 위한 토큰을 발급 받으면 이메일과 비밀번호를 조회할 수 있다.")
@@ -51,7 +52,6 @@ public class UserServiceTest {
                 .willReturn(Optional.empty());
         //when //then
         assertThatThrownBy(() -> userService.loadUserByUsername("홍길동"))
-                .hasMessage("홍길동"+ " 이름을 가진 유저는 존재하지 않습니다.");
+                .hasMessage("홍길동" + " 이름을 가진 유저는 존재하지 않습니다.");
     }
-
 }
