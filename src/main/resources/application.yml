@@ -1,0 +1,5 @@
+springdoc:
+  api-docs:
+    path: /swagger-ui/api-docs
+  swarger-ui:
+    path: /swagger-ui/docs
