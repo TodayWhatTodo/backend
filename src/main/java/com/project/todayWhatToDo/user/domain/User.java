@@ -1,5 +1,6 @@
 package com.project.todayWhatToDo.user.domain;
 
+import com.project.todayWhatToDo.security.Authority;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,12 +21,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(updatable = false)
-    @CreatedDate
-    private LocalDateTime createdAt;
-    @Column
-    @CreatedDate
-    private LocalDateTime visitedAt;
     @Column(unique = true)
     private String email;
     @Column
@@ -34,15 +29,31 @@ public class User {
     private String password;
     @Column
     private String name;
+    @Column(updatable = false)
+    @CreatedDate
+    private LocalDateTime createdAt;
     @Column
-    private String authority;
+    @CreatedDate
+    private LocalDateTime visitedAt;
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Authority authority;
+    @Column
+    private String companyName;
+    @Column
+    private String imagePath;
+    @Column
+    private Boolean isAcceptAlarm;
 
     @Builder
-    private User(String email, String nickname, String password, String name, String authority) {
+    private User(String email, String nickname, String password, String name, Authority authority, String companyName, String imagePath, Boolean isAcceptAlarm) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
         this.name = name;
         this.authority = authority;
+        this.companyName = companyName;
+        this.imagePath = imagePath;
+        this.isAcceptAlarm = isAcceptAlarm;
     }
 }

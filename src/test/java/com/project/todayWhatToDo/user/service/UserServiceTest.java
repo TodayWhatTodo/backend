@@ -1,5 +1,6 @@
 package com.project.todayWhatToDo.user.service;
 
+import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
@@ -23,7 +24,6 @@ public class UserServiceTest {
         userRepository = Mockito.mock(UserRepository.class);
         userService = new UserService(userRepository, new LoginApiManager());
     }
-
     @DisplayName("로그인 진행을 위한 토큰을 발급 받으면 이메일과 비밀번호를 조회할 수 있다.")
     @Test
     public void loadUserByUsername() {
@@ -33,7 +33,7 @@ public class UserServiceTest {
                 .nickname("today")
                 .password("qwerqwer2@")
                 .name("홍길동")
-                .authority("USER")
+                .authority(Authority.COMMON)
                 .build();
 
         given(userRepository.findByName(any()))

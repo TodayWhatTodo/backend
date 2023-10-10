@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.project.todayWhatToDo.security.Authority.COMMON;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,7 +33,7 @@ public class UserService implements UserDetailsService {
         return UserSecurityInfo.builder()
                 .email(user.getEmail())
                 .password(user.getPassword())
-                .authority(user.getAuthority())
+                .authority(user.getAuthority().name())
                 .build();
     }
 
@@ -53,7 +55,7 @@ public class UserService implements UserDetailsService {
 
     private void joinNormalUser(String email, String name, String password) {
         userRepository.save(User.builder()
-                .authority("user")
+                .authority(COMMON)
                 .name(name)
                 .nickname(UUID.randomUUID().toString())
                 .password(password)
