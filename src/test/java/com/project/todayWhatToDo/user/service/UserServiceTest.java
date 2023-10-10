@@ -2,6 +2,7 @@ package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.user.domain.User;
+import com.project.todayWhatToDo.user.dto.ModifyUserRequest;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
 import org.junit.jupiter.api.DisplayName;
@@ -53,5 +54,49 @@ public class UserServiceTest {
         //when //then
         assertThatThrownBy(() -> userService.loadUserByUsername("홍길동"))
                 .hasMessage("홍길동" + " 이름을 가진 유저는 존재하지 않습니다.");
+    }
+
+    @DisplayName("유저 닉네임을 수정하면 변경된다.")
+    @Test
+    public void updateNickname() {
+        //given
+        var findUser = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+
+        given(userRepository.findById(any()))
+                .willReturn(Optional.of(findUser));
+
+        var request = new ModifyUserRequest(1L, "after nickname");
+        //when
+        userService.modifyUserInfo(request);
+        //then
+        assertThat(findUser.getNickname()).isEqualTo("after nickname");
+    }
+
+    @DisplayName("유저 닉네임이 hull 이라면 수정되지 않는다.")
+    @Test
+    public void dontUpdateNickname() {
+        //given
+        var findUser = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+
+        given(userRepository.findById(any()))
+                .willReturn(Optional.of(findUser));
+
+        var request = new ModifyUserRequest(1L, null);
+        //when
+        userService.modifyUserInfo(request);
+        //then
+        assertThat(findUser.getNickname()).isEqualTo("today");
     }
 }

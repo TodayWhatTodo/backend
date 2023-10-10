@@ -2,10 +2,7 @@ package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -23,11 +20,12 @@ public class User {
     private Long id;
     @Column(unique = true)
     private String email;
-    @Column
+    @Setter
+    @Column(unique = true)
     private String nickname;
-    @Column
+    @Column(nullable = false)
     private String password;
-    @Column
+    @Column(nullable = false)
     private String name;
     @Column(updatable = false)
     @CreatedDate

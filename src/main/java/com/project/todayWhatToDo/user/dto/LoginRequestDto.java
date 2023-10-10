@@ -1,10 +1,10 @@
-package com.project.todayWhatToDo.user.request;
+package com.project.todayWhatToDo.user.dto;
 
 import lombok.Getter;
 
 @Getter
 
-public class LoginRequest {
+public class LoginRequestDto {
     private String oauthProvider;
     private String token;
 }

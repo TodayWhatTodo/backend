@@ -2,9 +2,11 @@ package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.UserSecurityInfo;
 import com.project.todayWhatToDo.user.domain.User;
+import com.project.todayWhatToDo.user.dto.ModifyUserRequest;
+import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
 import com.project.todayWhatToDo.user.repository.UserRepository;
-import com.project.todayWhatToDo.user.request.LoginRequest;
+import com.project.todayWhatToDo.user.dto.LoginRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -37,7 +39,7 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    public void login(LoginRequest request) {
+    public void login(LoginRequestDto request) {
 
         var response = loginManager.getProvider(request.getOauthProvider())
                 .getUserInfo(request.getToken());
@@ -61,5 +63,13 @@ public class UserService implements UserDetailsService {
                 .password(password)
                 .email(email)
                 .build());
+    }
+
+    public void modifyUserInfo(ModifyUserRequest request) {
+        Optional<User> user = userRepository.findById(request.id());
+        user.orElseThrow(UserNotFoundException::new);
+
+        User entity = user.get();
+        if (request.nickname() != null) entity.setNickname(request.nickname());
     }
 }
