@@ -24,7 +24,11 @@ public class LikePost extends BaseTimeEntity {
     private Post post;
 
     public void setPost(Post post) {
+        if(this.post != null) {
+            post.getLikePosts().remove(this);
+        }
         this.post = post;
+        post.getLikePosts().add(this);
     }
 
     public void setUser(User user) {
