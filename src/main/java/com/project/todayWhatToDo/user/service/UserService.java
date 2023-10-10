@@ -4,6 +4,7 @@ import com.project.todayWhatToDo.security.UserSecurityInfo;
 import com.project.todayWhatToDo.user.domain.Career;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
+import com.project.todayWhatToDo.user.dto.FollowRequestDto;
 import com.project.todayWhatToDo.user.dto.LoginRequestDto;
 import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
@@ -91,5 +92,16 @@ public class UserService implements UserDetailsService {
                         .position(request.position())
                         .build()
         );
+    }
+
+    public void follow(FollowRequestDto request){
+        var follower = userRepository.findById(request.followerId()).orElseThrow(UserNotFoundException::new);
+        var user = userRepository.findById(request.userId()).orElseThrow(UserNotFoundException::new);
+
+        user.addFollowing(follower);
+    }
+
+    //todo
+    public void followCancel(){
     }
 }

@@ -47,10 +47,18 @@ public class User {
     @Column
     private String introduction;
     @Column
+    private Integer followerCount;
+    @Column
+    private Integer followingCount;
+    @Column
     private Boolean isAcceptAlarm;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Career> careers = new ArrayList<>();
+    @OneToMany(mappedBy = "follower")
+    private List<Follow> followers = new ArrayList<>();
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followings = new ArrayList<>();
 
     @Builder
     private User(String email, String nickname, String password, String name, Authority authority, String companyName, String imagePath, String introduction, Boolean isAcceptAlarm) {
@@ -62,6 +70,8 @@ public class User {
         this.companyName = companyName;
         this.imagePath = imagePath;
         this.introduction = introduction;
+        this.followerCount = 0;
+        this.followingCount = 0;
         this.isAcceptAlarm = isAcceptAlarm;
     }
 
@@ -73,15 +83,40 @@ public class User {
         return careers.stream().toList();
     }
 
+    public List<Follow> getFollowers() {
+        return followers.stream().toList();
+    }
+
+    public List<Follow> getFollowings() {
+        return followings.stream().toList();
+    }
+
     public void setNickname(String nickname) {
         if (nickname != null) this.nickname = nickname;
     }
 
     public void setIntroduction(String introduction) {
-        if(introduction != null) this.introduction = introduction;
+        if (introduction != null) this.introduction = introduction;
     }
 
     public void setCompanyName(String companyName) {
-        if(companyName != null) this.companyName = companyName;
+        if (companyName != null) this.companyName = companyName;
     }
+
+    private void addFollower(Follow follow) {
+        followerCount++;
+        followers.add(follow);
+    }
+
+    public void addFollowing(User follower) {
+        this.followingCount++;
+        Follow follow = Follow.builder()
+                .following(this)
+                .follower(follower)
+                .build();
+
+        followings.add(follow);
+        follower.addFollower(follow);
+    }
+
 }

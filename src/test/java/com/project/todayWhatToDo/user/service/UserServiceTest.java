@@ -3,6 +3,7 @@ package com.project.todayWhatToDo.user.service;
 import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
+import com.project.todayWhatToDo.user.dto.FollowRequestDto;
 import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
 import com.project.todayWhatToDo.user.repository.UserRepository;
@@ -181,4 +182,39 @@ public class UserServiceTest {
 
     }
 
+    @DisplayName("팔로우 : 팔로우 등록시 팔로잉 유저의 팔로잉 수가 1 증가하고 팔로워 유저의 팔로워 수가 1 증가한다.")
+    @Test
+    public void follow() {
+        //given
+        var follower = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+
+        var followingUser = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+
+        given(userRepository.findById(1L)).willReturn(Optional.of(follower));
+        given(userRepository.findById(2L)).willReturn(Optional.of(followingUser));
+
+        var request = FollowRequestDto.builder()
+                .followerId(1L)
+                .userId(2L)
+                .build();
+        //when
+        userService.follow(request);
+        //then
+        assertThat(followingUser.getFollowingCount()).isOne();
+        assertThat(follower.getFollowerCount()).isOne();
+    }
 }
