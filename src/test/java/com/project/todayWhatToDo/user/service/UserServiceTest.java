@@ -1,12 +1,11 @@
 package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.Authority;
-import com.project.todayWhatToDo.user.domain.Career;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
 import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
-import com.project.todayWhatToDo.user.repository.UserRepository;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
+import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
