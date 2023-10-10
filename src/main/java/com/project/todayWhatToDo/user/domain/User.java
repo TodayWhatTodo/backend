@@ -1,6 +1,7 @@
 package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
+import com.project.todayWhatToDo.user.dto.UserSession;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -78,10 +79,18 @@ public class User {
     }
 
     public void setIntroduction(String introduction) {
-        if(introduction != null) this.introduction = introduction;
+        if (introduction != null) this.introduction = introduction;
     }
 
     public void setCompanyName(String companyName) {
-        if(companyName != null) this.companyName = companyName;
+        if (companyName != null) this.companyName = companyName;
+    }
+
+    public UserSession toSession() {
+        return UserSession.builder()
+                .email(email)
+                .name(name)
+                .id(getId())
+                .build();
     }
 }

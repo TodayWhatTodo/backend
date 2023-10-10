@@ -1,16 +1,20 @@
 package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
+import com.project.todayWhatToDo.user.dto.UserSession;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.spy;
 
 public class UserTest {
 
@@ -84,7 +88,7 @@ public class UserTest {
 
     @DisplayName("setter 함수 사용시")
     @Nested
-    class setterTest{
+    class setterTest {
 
         User user = User.builder()
                 .email("today@naver.com")
@@ -95,6 +99,7 @@ public class UserTest {
                 .name("홍길동")
                 .authority(Authority.COMMON)
                 .build();
+
         @DisplayName("nickname이 변경된다.")
         @Test
         public void nickname() {
@@ -139,5 +144,28 @@ public class UserTest {
                     .isNotNull()
                     .isEqualTo(beforeNickname);
         }
+    }
+
+    @DisplayName("상태 관리가 필요한 데이터를 반환한다.")
+    @Test
+    public void toSession() {
+        //given
+        User user = spy(User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .companyName("before company")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build());
+
+        given(user.getId()).willReturn(1L);
+        //when
+        var session = user.toSession();
+        //then
+        assertThat(session.email()).isEqualTo("today@naver.com");
+        assertThat(session.name()).isEqualTo("홍길동");
+        assertThat(session.id()).isEqualTo(1L);
     }
 }

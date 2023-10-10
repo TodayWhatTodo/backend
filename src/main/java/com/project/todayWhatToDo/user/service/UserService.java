@@ -1,13 +1,13 @@
 package com.project.todayWhatToDo.user.service;
 
+import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.security.UserSecurityInfo;
 import com.project.todayWhatToDo.user.domain.Career;
 import com.project.todayWhatToDo.user.domain.User;
-import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
-import com.project.todayWhatToDo.user.dto.LoginRequestDto;
-import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
+import com.project.todayWhatToDo.user.dto.*;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
+import com.project.todayWhatToDo.user.login.handler.LoginResponseHandler;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,10 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
-
-import static com.project.todayWhatToDo.security.Authority.COMMON;
+import static com.project.todayWhatToDo.security.Authority.*;
 
 @Service
 @RequiredArgsConstructor
@@ -41,30 +38,43 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    public void login(LoginRequestDto request) {
+    public UserSession login(LoginRequestDto request) {
 
-        var response = loginManager.getProvider(request.oauthProvider())
-                .getUserInfo(request.token());
+        var response = getUserInfo(request.provider(), request.token());
 
         var email = response.getEmail();
         var name = response.getName();
         var password = response.getPassword();
 
-        Optional<User> data = userRepository.findByEmailAndNameAndPassword(email, name, password);
+        User user = userRepository.findByEmailAndNameAndPassword(email, name, password)
+                .orElseThrow(UserNotFoundException::new);
 
-        if (data.isEmpty()) {
-            joinNormalUser(email, name, password);
-        }
+        return user.toSession();
     }
 
-    private void joinNormalUser(String email, String name, String password) {
-        userRepository.save(User.builder()
-                .authority(COMMON)
-                .name(name)
-                .nickname(UUID.randomUUID().toString())
-                .password(password)
-                .email(email)
-                .build());
+    private LoginResponseHandler getUserInfo(String provider, String token) {
+        return loginManager.getProvider(provider)
+                .getUserInfo(token);
+    }
+
+    public UserSession joinUser(CreateUserRequestDto request) {
+        var response = getUserInfo(request.provider(), request.token());
+
+        var name = response.getName();
+        var email = response.getEmail();
+        var password = response.getPassword();
+
+        return userRepository.save(User.builder()
+                        .name(name)
+                        .email(email)
+                        .password(password)
+                        .introduction(request.introduction())
+                        .isAcceptAlarm(request.isAcceptAlarm())
+                        .imagePath(request.imagePath())
+                        .authority(COMMON)
+                        .build()
+                )
+                .toSession();
     }
 
     public void modifyUserInfo(ModifyUserRequestDto request) {

@@ -2,14 +2,15 @@ package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.user.domain.User;
-import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
-import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
+import com.project.todayWhatToDo.user.dto.*;
+import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
+import com.project.todayWhatToDo.user.login.LoginApiProvider;
+import com.project.todayWhatToDo.user.login.handler.LoginResponseHandler;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,15 +19,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 public class UserServiceTest {
 
     UserRepository userRepository;
     UserService userService;
+    LoginApiManager loginApiManager;
 
     public UserServiceTest() {
-        userRepository = Mockito.mock(UserRepository.class);
-        userService = new UserService(userRepository, new LoginApiManager());
+        userRepository = mock(UserRepository.class);
+        loginApiManager = mock(LoginApiManager.class);
+        userService = new UserService(userRepository, loginApiManager);
     }
 
     @Test
@@ -181,4 +185,75 @@ public class UserServiceTest {
 
     }
 
+    @DisplayName("로그인 : 로그인 성공시 예외가 발생하지 않는다")
+    @Test
+    public void loginSuccess() {
+        //given
+        mockingGetUserInfo("today@naver.com", "홍길동", "qwerqwer2@");
+        var request = new LoginRequestDto("kakao", "test token");
+
+        given(userRepository
+                .findByEmailAndNameAndPassword("today@naver.com", "홍길동", "qwerqwer2@"))
+                .willReturn(Optional.of(User.builder()
+                        .email("today@naver.com")
+                        .name("홍길동")
+                        .build()));
+        //when //then
+        var session = userService.login(request);
+        assertThat(session).extracting("email", "name")
+                .containsExactly("today@naver.com", "홍길동");
+    }
+
+    @DisplayName("로그인 : 로그인 실패시 UserNotFoundException")
+    @Test
+    public void loginFail() {
+        //given
+        mockingGetUserInfo("today@naver.com", "홍길", "qwerqwer2@");
+        var request = new LoginRequestDto("kakao", "test token");
+
+        given(userRepository
+                .findByEmailAndNameAndPassword("today@naver.com", "홍길동", "qwerqwer2@"))
+                .willReturn(Optional.of(User.builder().build()));
+        //when //then
+        assertThatThrownBy(() -> userService.login(request))
+                .isInstanceOf(UserNotFoundException.class);
+    }
+
+    private void mockingGetUserInfo(String email, String name, String password) {
+        var loginProvider = mock(LoginApiProvider.class);
+
+        given(loginApiManager.getProvider(any()))
+                .willReturn(loginProvider);
+
+        var handler = mock(LoginResponseHandler.class);
+        given(loginProvider.getUserInfo(any()))
+                .willReturn(handler);
+
+        given(handler.getEmail()).willReturn(email);
+        given(handler.getName()).willReturn(name);
+        given(handler.getPassword()).willReturn(password);
+    }
+
+    @DisplayName("회원가입 : 회원가입 성공시 회원 정보를 반환한다.")
+    @Test
+    public void joinUser() {
+        //given
+        var request = CreateUserRequestDto.builder()
+                .token("test token")
+                .nickname("hello world")
+                .companyName("hello company")
+                .isAcceptAlarm(false)
+                .build();
+
+        mockingGetUserInfo("hello@naver.com", "홍길동", "qwerqwer2@");
+
+        given(userRepository.save(any()))
+                .willAnswer((mock) -> mock.getArgument(0));
+
+        //when
+        var session = userService.joinUser(request);
+        //then
+        assertThat(session).extracting("email", "name")
+                .containsExactly("hello@naver.com", "홍길동");
+    }
 }
