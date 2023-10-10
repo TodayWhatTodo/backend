@@ -90,6 +90,7 @@ public class UserTest {
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
+                .companyName("before company")
                 .password("qwerqwer2@")
                 .name("홍길동")
                 .authority(Authority.COMMON)
@@ -103,17 +104,6 @@ public class UserTest {
             assertThat(user.getNickname()).isEqualTo("after nickname");
         }
 
-        @DisplayName("nickname 이 null 이라면 변경하지 않는다.")
-        @Test
-        public void nicknameNull() {
-            //given //when
-            String before = user.getNickname();
-            user.setNickname(null);
-            //then
-            assertThat(user.getNickname())
-                    .isNotNull()
-                    .isEqualTo(before);
-        }
 
         @DisplayName("introduction 변경된다.")
         @Test
@@ -124,16 +114,30 @@ public class UserTest {
             assertThat(user.getIntroduction()).isEqualTo("after introduction");
         }
 
-        @DisplayName("introduction 이 null 이라면 변경하지 않는다.")
+        @DisplayName("재직 회사명이 변경된다.")
         @Test
-        public void introductionNull() {
+        public void companyName() {
             //given //when
-            String before = user.getIntroduction();
+            user.setCompanyName("after company");
+            //then
+            assertThat(user.getCompanyName()).isEqualTo("after company");
+        }
+
+        @DisplayName("setter input이 null 이라면 변경하지 않는다.")
+        @Test
+        public void setterWhenNull() {
+            //given //when
+            String beforeIntroduction = user.getIntroduction();
+            String beforeNickname = user.getNickname();
+            user.setNickname(null);
             user.setIntroduction(null);
             //then
             assertThat(user.getIntroduction())
                     .isNotNull()
-                    .isEqualTo(before);
+                    .isEqualTo(beforeIntroduction);
+            assertThat(user.getNickname())
+                    .isNotNull()
+                    .isEqualTo(beforeNickname);
         }
     }
 }

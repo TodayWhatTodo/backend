@@ -80,4 +80,8 @@ public class User {
     public void setIntroduction(String introduction) {
         if(introduction != null) this.introduction = introduction;
     }
+
+    public void setCompanyName(String companyName) {
+        if(companyName != null) this.companyName = companyName;
+    }
 }

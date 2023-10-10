@@ -74,6 +74,7 @@ public class UserService implements UserDetailsService {
 
         user.setNickname(request.nickname());
         user.setIntroduction(request.introduction());
+        user.setCompanyName(request.companyName());
     }
 
     public void createCareer(CreateCareerRequestDto request) {
