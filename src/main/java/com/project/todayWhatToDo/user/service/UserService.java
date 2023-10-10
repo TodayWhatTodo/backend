@@ -1,14 +1,10 @@
 package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.UserSecurityInfo;
-import com.project.todayWhatToDo.user.domain.Career;
 import com.project.todayWhatToDo.user.domain.User;
-import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
-import com.project.todayWhatToDo.user.dto.LoginRequestDto;
-import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
-import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
 import com.project.todayWhatToDo.user.repository.UserRepository;
+import com.project.todayWhatToDo.user.dto.LoginRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import static com.project.todayWhatToDo.security.Authority.COMMON;
 
 @Service
 @RequiredArgsConstructor
@@ -37,14 +31,14 @@ public class UserService implements UserDetailsService {
         return UserSecurityInfo.builder()
                 .email(user.getEmail())
                 .password(user.getPassword())
-                .authority(user.getAuthority().name())
+                .authority(user.getAuthority())
                 .build();
     }
 
     public void login(LoginRequestDto request) {
 
-        var response = loginManager.getProvider(request.getOauthProvider())
-                .getUserInfo(request.getToken());
+        var response = loginManager.getProvider(request.oauthProvider())
+                .getUserInfo(request.token());
 
         var email = response.getEmail();
         var name = response.getName();
@@ -59,36 +53,11 @@ public class UserService implements UserDetailsService {
 
     private void joinNormalUser(String email, String name, String password) {
         userRepository.save(User.builder()
-                .authority(COMMON)
+                .authority("user")
                 .name(name)
                 .nickname(UUID.randomUUID().toString())
                 .password(password)
                 .email(email)
                 .build());
-    }
-
-    public void modifyUserInfo(ModifyUserRequestDto request) {
-
-        User user = userRepository.findById(request.id())
-                .orElseThrow(UserNotFoundException::new);
-
-        user.setNickname(request.nickname());
-        user.setIntroduction(request.introduction());
-    }
-
-    public void createCareer(CreateCareerRequestDto request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(UserNotFoundException::new);
-
-        user.addCareer(
-                Career.builder()
-                        .user(user)
-                        .name(request.name())
-                        .introduction(request.introduction())
-                        .startedAt(request.startedAt())
-                        .endedAt(request.endedAt())
-                        .position(request.position())
-                        .build()
-        );
     }
 }
