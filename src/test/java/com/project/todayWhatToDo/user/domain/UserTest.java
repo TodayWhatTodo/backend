@@ -1,12 +1,10 @@
 package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
-import com.project.todayWhatToDo.user.dto.UserSession;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -73,7 +71,11 @@ public class UserTest {
 
         var career = Career.builder()
                 .user(user)
-                .name("todo company")
+                .company(Company.builder()
+                        .name("todo company")
+                        .address("test address")
+                        .build()
+                )
                 .introduction("my first job")
                 .startedAt(startedAt)
                 .endedAt(endedAt)
@@ -82,8 +84,12 @@ public class UserTest {
         //when
         user.addCareer(career);
         //then
-        assertThat(user.getCareers()).extracting("introduction", "startedAt", "endedAt", "position", "name")
-                .contains(Tuple.tuple("my first job", startedAt, endedAt, "대리", "todo company"));
+        assertThat(user.getCareers()).extracting("introduction", "startedAt", "endedAt", "position", "company")
+                .contains(Tuple.tuple("my first job", startedAt, endedAt, "대리",
+                        Company.builder()
+                                .name("todo company")
+                                .address("test address")
+                                .build()));
     }
 
     @DisplayName("setter 함수 사용시")
@@ -94,7 +100,10 @@ public class UserTest {
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
-                .companyName("before company")
+                .company(Company.builder()
+                        .name("before company")
+                        .address("test address")
+                        .build())
                 .password("qwerqwer2@")
                 .name("홍길동")
                 .authority(Authority.COMMON)
@@ -119,13 +128,17 @@ public class UserTest {
             assertThat(user.getIntroduction()).isEqualTo("after introduction");
         }
 
-        @DisplayName("재직 회사명이 변경된다.")
+        @DisplayName("재직 회사를 변경한다.")
         @Test
-        public void companyName() {
+        public void company() {
             //given //when
-            user.setCompanyName("after company");
+            user.setCompany(Company.builder()
+                    .name("after company")
+                    .address("test address")
+                    .build());
             //then
-            assertThat(user.getCompanyName()).isEqualTo("after company");
+            assertThat(user.getCompany()).extracting("name")
+                    .isEqualTo("after company");
         }
 
         @DisplayName("setter input이 null 이라면 변경하지 않는다.")
@@ -134,8 +147,12 @@ public class UserTest {
             //given //when
             String beforeIntroduction = user.getIntroduction();
             String beforeNickname = user.getNickname();
+            String beforeCompanyName = user.getCompany().getName();
             user.setNickname(null);
             user.setIntroduction(null);
+            user.setCompany(Company.builder()
+                            .name(null)
+                    .build());
             //then
             assertThat(user.getIntroduction())
                     .isNotNull()
@@ -143,6 +160,9 @@ public class UserTest {
             assertThat(user.getNickname())
                     .isNotNull()
                     .isEqualTo(beforeNickname);
+            assertThat(user.getCompany().getName())
+                    .isNotNull()
+                    .isEqualTo(beforeCompanyName);
         }
     }
 
@@ -154,7 +174,11 @@ public class UserTest {
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
-                .companyName("before company")
+                .company(Company.builder()
+                        .name("before company")
+                        .address("test address")
+                        .build()
+                )
                 .password("qwerqwer2@")
                 .name("홍길동")
                 .authority(Authority.COMMON)

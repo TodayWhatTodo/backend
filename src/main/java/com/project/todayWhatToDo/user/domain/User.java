@@ -41,8 +41,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column
     private Authority authority;
-    @Column
-    private String companyName;
+    @Embedded
+    private Company company;
     @Column
     private String imagePath;
     @Column
@@ -50,18 +50,18 @@ public class User {
     @Column
     private Boolean isAcceptAlarm;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Career> careers = new ArrayList<>();
 
     @Builder
-    private User(String email, String nickname, String password, String name, Authority authority, String companyName, String imagePath, String introduction, Boolean isAcceptAlarm) {
+    private User(String email, String nickname, String password, String name, Authority authority, Company company, String imagePath, String introduction, Boolean isAcceptAlarm) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
         this.name = name;
         this.authority = authority;
-        this.companyName = companyName;
         this.imagePath = imagePath;
+        this.company = company;
         this.introduction = introduction;
         this.isAcceptAlarm = isAcceptAlarm;
     }
@@ -82,8 +82,8 @@ public class User {
         if (introduction != null) this.introduction = introduction;
     }
 
-    public void setCompanyName(String companyName) {
-        if (companyName != null) this.companyName = companyName;
+    public void setCompany(Company company) {
+        if (company != null && company.getName() != null) this.company = company;
     }
 
     public UserSession toSession() {

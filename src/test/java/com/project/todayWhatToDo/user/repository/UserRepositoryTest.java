@@ -3,6 +3,7 @@ package com.project.todayWhatToDo.user.repository;
 import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.user.domain.Career;
+import com.project.todayWhatToDo.user.domain.Company;
 import com.project.todayWhatToDo.user.domain.User;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
@@ -95,7 +96,11 @@ public class UserRepositoryTest extends IntegrationTest {
 
         var career = Career.builder()
                 .user(user)
-                .name("todo company")
+                .company(Company.builder()
+                        .name("todo company")
+                        .address("address")
+                        .build()
+                )
                 .introduction("my first job")
                 .startedAt(startedAt)
                 .endedAt(endedAt)
@@ -105,8 +110,11 @@ public class UserRepositoryTest extends IntegrationTest {
         user.addCareer(career);
         repository.flush();
         //then
-        Career findCareer = em.find(Career.class, career.getId());
-        assertThat(findCareer).extracting("introduction", "startedAt", "endedAt", "position", "name")
-                .containsExactly("my first job", startedAt, endedAt, "대리", "todo company");
+        assertThat(em.find(Career.class, career.getId()))
+                .extracting("introduction", "startedAt", "endedAt", "position", "company")
+                .containsExactly("my first job", startedAt, endedAt, "대리", Company.builder()
+                        .name("todo company")
+                        .address("address")
+                        .build());
     }
 }

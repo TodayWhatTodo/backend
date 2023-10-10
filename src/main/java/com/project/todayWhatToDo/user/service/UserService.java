@@ -1,8 +1,8 @@
 package com.project.todayWhatToDo.user.service;
 
-import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.security.UserSecurityInfo;
 import com.project.todayWhatToDo.user.domain.Career;
+import com.project.todayWhatToDo.user.domain.Company;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.*;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
@@ -84,7 +84,11 @@ public class UserService implements UserDetailsService {
 
         user.setNickname(request.nickname());
         user.setIntroduction(request.introduction());
-        user.setCompanyName(request.companyName());
+        user.setCompany(Company.builder()
+                .name(request.companyName())
+                .address(request.companyAddress())
+                .build());
+
     }
 
     public void createCareer(CreateCareerRequestDto request) {
@@ -94,7 +98,11 @@ public class UserService implements UserDetailsService {
         user.addCareer(
                 Career.builder()
                         .user(user)
-                        .name(request.name())
+                        .company(Company.builder()
+                                .name(request.name())
+                                .address(request.address())
+                                .build()
+                        )
                         .introduction(request.introduction())
                         .startedAt(request.startedAt())
                         .endedAt(request.endedAt())

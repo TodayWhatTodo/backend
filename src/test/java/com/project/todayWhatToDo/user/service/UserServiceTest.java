@@ -1,6 +1,7 @@
 package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.Authority;
+import com.project.todayWhatToDo.user.domain.Company;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.*;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
@@ -79,7 +80,10 @@ public class UserServiceTest {
         given(userRepository.findById(any()))
                 .willReturn(Optional.of(findUser));
 
-        var request = new ModifyUserRequestDto(1L, "after nickname", null, null);
+        var request = ModifyUserRequestDto.builder()
+                .id(1L)
+                .nickname("after nickname")
+                .build();
         //when
         userService.modifyUserInfo(request);
         //then
@@ -101,7 +105,10 @@ public class UserServiceTest {
         given(userRepository.findById(any()))
                 .willReturn(Optional.of(findUser));
 
-        var request = new ModifyUserRequestDto(1L, null, "after self introduction", null);
+        var request = ModifyUserRequestDto.builder()
+                .id(1L)
+                .introduction("after self introduction")
+                .build();
         //when
         userService.modifyUserInfo(request);
         //then
@@ -117,7 +124,10 @@ public class UserServiceTest {
                 .nickname("today")
                 .introduction("today is fun")
                 .password("qwerqwer2@")
-                .companyName("hello company")
+                .company(Company.builder()
+                        .name("hello company")
+                        .address("test address")
+                        .build())
                 .name("홍길동")
                 .authority(Authority.COMMON)
                 .build();
@@ -125,11 +135,14 @@ public class UserServiceTest {
         given(userRepository.findById(any()))
                 .willReturn(Optional.of(user));
 
-        var request = new ModifyUserRequestDto(1L, null, null, "bye company");
+        var request = ModifyUserRequestDto.builder()
+                .id(1L)
+                .companyName("bye company")
+                .build();
         //when
         userService.modifyUserInfo(request);
         //then
-        assertThat(user.getCompanyName()).isEqualTo("bye company");
+        assertThat(user.getCompany()).extracting("name").isEqualTo("bye company");
     }
 
     @DisplayName("프로필 수정 : 유저 변경 정보가 null 이라면 수정 하지 않는다.")
@@ -141,7 +154,10 @@ public class UserServiceTest {
                 .nickname("today")
                 .introduction("today is fun")
                 .password("qwerqwer2@")
-                .companyName("hello company")
+                .company(Company.builder()
+                        .name("hello company")
+                        .address("test address")
+                        .build())
                 .name("홍길동")
                 .authority(Authority.COMMON)
                 .build();
@@ -149,13 +165,15 @@ public class UserServiceTest {
         given(userRepository.findById(any()))
                 .willReturn(Optional.of(findUser));
 
-        var request = new ModifyUserRequestDto(1L, null, null, null);
+        var request = ModifyUserRequestDto.builder()
+                .id(1L)
+                .build();
         //when
         userService.modifyUserInfo(request);
         //then
         assertThat(findUser.getNickname()).isEqualTo("today");
         assertThat(findUser.getIntroduction()).isEqualTo("today is fun");
-        assertThat(findUser.getCompanyName()).isEqualTo("hello company");
+        assertThat(findUser.getCompany().getName()).isEqualTo("hello company");
     }
 
     @DisplayName("경력 추가 : 회사경력을 추가하면 유저 커리어에 반영된다.")
@@ -176,7 +194,7 @@ public class UserServiceTest {
 
         var startedAt = LocalDateTime.of(2000, 10, 10, 10, 10, 10);
         var endedAt = LocalDateTime.of(2001, 10, 10, 10, 10, 10);
-        var request = new CreateCareerRequestDto(1L, "todo company", "my first job", startedAt, endedAt, "대리");
+        var request = new CreateCareerRequestDto(1L, "todo company", "test address", "my first job", startedAt, endedAt, "대리");
         //when
         userService.createCareer(request);
         //then

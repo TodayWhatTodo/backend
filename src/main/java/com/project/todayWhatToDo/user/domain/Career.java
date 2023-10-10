@@ -19,8 +19,8 @@ public class Career {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    @Column(nullable = false)
-    private String name;
+    @Embedded
+    private Company company;
     @Column
     private String introduction;
     @Column(nullable = false)
@@ -31,9 +31,9 @@ public class Career {
     private String position;
 
     @Builder
-    private Career(User user, String name, String introduction, LocalDateTime startedAt, LocalDateTime endedAt, String position) {
+    private Career(User user, Company company, String introduction, LocalDateTime startedAt, LocalDateTime endedAt, String position) {
         this.user = user;
-        this.name = name;
+        this.company = company;
         this.introduction = introduction;
         this.startedAt = startedAt;
         this.endedAt = endedAt;
