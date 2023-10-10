@@ -43,8 +43,8 @@ public class UserService implements UserDetailsService {
 
     public void login(LoginRequestDto request) {
 
-        var response = loginManager.getProvider(request.getOauthProvider())
-                .getUserInfo(request.getToken());
+        var response = loginManager.getProvider(request.oauthProvider())
+                .getUserInfo(request.token());
 
         var email = response.getEmail();
         var name = response.getName();
