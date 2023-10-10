@@ -1,4 +1,4 @@
-package com.project.todayWhatToDo;
+package com.project.todayWhatToDo.board;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
