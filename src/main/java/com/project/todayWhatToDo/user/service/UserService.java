@@ -71,5 +71,6 @@ public class UserService implements UserDetailsService {
 
         User entity = user.get();
         if (request.nickname() != null) entity.setNickname(request.nickname());
+        if(request.introduction() != null) entity.setIntroduction(request.introduction());
     }
 }

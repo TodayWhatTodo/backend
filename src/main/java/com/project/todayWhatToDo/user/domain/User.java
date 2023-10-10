@@ -40,11 +40,15 @@ public class User {
     private String companyName;
     @Column
     private String imagePath;
+    @Setter
+    @Column
+    private String introduction;
+
     @Column
     private Boolean isAcceptAlarm;
 
     @Builder
-    private User(String email, String nickname, String password, String name, Authority authority, String companyName, String imagePath, Boolean isAcceptAlarm) {
+    private User(String email, String nickname, String password, String name, Authority authority, String companyName, String imagePath, String introduction, Boolean isAcceptAlarm) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
@@ -52,6 +56,7 @@ public class User {
         this.authority = authority;
         this.companyName = companyName;
         this.imagePath = imagePath;
+        this.introduction = introduction;
         this.isAcceptAlarm = isAcceptAlarm;
     }
 }

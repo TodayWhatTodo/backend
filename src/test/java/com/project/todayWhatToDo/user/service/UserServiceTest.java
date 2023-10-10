@@ -71,16 +71,16 @@ public class UserServiceTest {
         given(userRepository.findById(any()))
                 .willReturn(Optional.of(findUser));
 
-        var request = new ModifyUserRequest(1L, "after nickname");
+        var request = new ModifyUserRequest(1L, "after nickname", null);
         //when
         userService.modifyUserInfo(request);
         //then
         assertThat(findUser.getNickname()).isEqualTo("after nickname");
     }
 
-    @DisplayName("유저 닉네임이 hull 이라면 수정되지 않는다.")
+    @DisplayName("")
     @Test
-    public void dontUpdateNickname() {
+    public void updateIntroduction() {
         //given
         var findUser = User.builder()
                 .email("today@naver.com")
@@ -93,10 +93,34 @@ public class UserServiceTest {
         given(userRepository.findById(any()))
                 .willReturn(Optional.of(findUser));
 
-        var request = new ModifyUserRequest(1L, null);
+        var request = new ModifyUserRequest(1L, null, "after self introduction");
+        //when
+        userService.modifyUserInfo(request);
+        //then
+        assertThat(findUser.getIntroduction()).isEqualTo("after self introduction");
+    }
+
+    @DisplayName("유저 변경 정보가 null 이라면 수정 하지 않는다.")
+    @Test
+    public void dontUpdate() {
+        //given
+        var findUser = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+
+        given(userRepository.findById(any()))
+                .willReturn(Optional.of(findUser));
+
+        var request = new ModifyUserRequest(1L, null, null);
         //when
         userService.modifyUserInfo(request);
         //then
         assertThat(findUser.getNickname()).isEqualTo("today");
+        assertThat(findUser.getIntroduction()).isEqualTo("today is fun");
     }
 }
