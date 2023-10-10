@@ -7,6 +7,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Table(name = "USERS")
 @Entity
@@ -20,7 +23,6 @@ public class User {
     private Long id;
     @Column(unique = true)
     private String email;
-    @Setter
     @Column(unique = true)
     private String nickname;
     @Column(nullable = false)
@@ -40,12 +42,13 @@ public class User {
     private String companyName;
     @Column
     private String imagePath;
-    @Setter
     @Column
     private String introduction;
-
     @Column
     private Boolean isAcceptAlarm;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Career> careers = new ArrayList<>();
 
     @Builder
     private User(String email, String nickname, String password, String name, Authority authority, String companyName, String imagePath, String introduction, Boolean isAcceptAlarm) {
@@ -58,5 +61,21 @@ public class User {
         this.imagePath = imagePath;
         this.introduction = introduction;
         this.isAcceptAlarm = isAcceptAlarm;
+    }
+
+    public void addCareer(Career career) {
+        careers.add(career);
+    }
+
+    public List<Career> getCareers() {
+        return careers.stream().toList();
+    }
+
+    public void setNickname(String nickname) {
+        if (nickname != null) this.nickname = nickname;
+    }
+
+    public void setIntroduction(String introduction) {
+        if(introduction != null) this.introduction = introduction;
     }
 }

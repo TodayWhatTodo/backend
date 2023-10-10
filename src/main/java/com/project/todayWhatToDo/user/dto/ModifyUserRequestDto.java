@@ -1,6 +1,6 @@
 package com.project.todayWhatToDo.user.dto;
 
-public record ModifyUserRequest(
+public record ModifyUserRequestDto(
         Long id,
         String nickname,
         String introduction

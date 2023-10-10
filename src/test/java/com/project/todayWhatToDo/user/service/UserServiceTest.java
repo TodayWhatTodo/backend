@@ -1,14 +1,18 @@
 package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.Authority;
+import com.project.todayWhatToDo.user.domain.Career;
 import com.project.todayWhatToDo.user.domain.User;
-import com.project.todayWhatToDo.user.dto.ModifyUserRequest;
+import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
+import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,14 +75,14 @@ public class UserServiceTest {
         given(userRepository.findById(any()))
                 .willReturn(Optional.of(findUser));
 
-        var request = new ModifyUserRequest(1L, "after nickname", null);
+        var request = new ModifyUserRequestDto(1L, "after nickname", null);
         //when
         userService.modifyUserInfo(request);
         //then
         assertThat(findUser.getNickname()).isEqualTo("after nickname");
     }
 
-    @DisplayName("")
+    @DisplayName("소개글을 수정하면 변경된다.")
     @Test
     public void updateIntroduction() {
         //given
@@ -93,7 +97,7 @@ public class UserServiceTest {
         given(userRepository.findById(any()))
                 .willReturn(Optional.of(findUser));
 
-        var request = new ModifyUserRequest(1L, null, "after self introduction");
+        var request = new ModifyUserRequestDto(1L, null, "after self introduction");
         //when
         userService.modifyUserInfo(request);
         //then
@@ -116,11 +120,38 @@ public class UserServiceTest {
         given(userRepository.findById(any()))
                 .willReturn(Optional.of(findUser));
 
-        var request = new ModifyUserRequest(1L, null, null);
+        var request = new ModifyUserRequestDto(1L, null, null);
         //when
         userService.modifyUserInfo(request);
         //then
         assertThat(findUser.getNickname()).isEqualTo("today");
         assertThat(findUser.getIntroduction()).isEqualTo("today is fun");
+    }
+
+    @DisplayName("커리어를 추가하면 유저 커리어에 반영된다.")
+    @Test
+    public void createCareer() {
+        //given
+        var user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+
+        given(userRepository.findById(any()))
+                .willReturn(Optional.of(user));
+
+        var startedAt = LocalDateTime.of(2000, 10, 10, 10, 10, 10);
+        var endedAt = LocalDateTime.of(2001, 10, 10, 10, 10, 10);
+        var request = new CreateCareerRequestDto(1L, "todo company", "my first job", startedAt, endedAt, "대리");
+        //when
+        userService.createCareer(request);
+        //then
+        assertThat(user.getCareers()).extracting("introduction", "startedAt", "endedAt", "position")
+                .contains(Tuple.tuple("my first job", startedAt, endedAt, "대리"));
+
     }
 }

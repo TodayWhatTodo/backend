@@ -1,15 +1,22 @@
 package com.project.todayWhatToDo.user.domain;
 
+import com.project.todayWhatToDo.security.Authority;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class UserTest {
 
     @DisplayName("getter method test")
     @Test
-    void getter(){
+    void getter() {
         // given
         User user = User.builder()
                 .email("today@naver.com")
@@ -23,5 +30,110 @@ public class UserTest {
         assertThat(user.getPassword()).isEqualTo("qwerqwer2@");
         assertThat(user.getNickname()).isEqualTo("today");
         assertThat(user.getEmail()).isEqualTo("today@naver.com");
+    }
+
+    @DisplayName("커리어 리스트 조회 내용을 변경할 수 없다.")
+    @Test
+    public void getCareer() {
+        //given
+        var user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+        //when
+        List<Career> careers = user.getCareers();
+        //then
+        assertThatThrownBy(() -> careers.add(null))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @DisplayName("커리어를 추가시에 user를 통해서 해당 커리어가 조회된다.")
+    @Test
+    public void addCareer() {
+        //given
+        var user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+
+        LocalDateTime startedAt = LocalDateTime.of(2000, 10, 10, 10, 10, 10);
+        LocalDateTime endedAt = LocalDateTime.of(2001, 10, 10, 10, 10, 10);
+
+        var career = Career.builder()
+                .user(user)
+                .name("todo company")
+                .introduction("my first job")
+                .startedAt(startedAt)
+                .endedAt(endedAt)
+                .position("대리")
+                .build();
+        //when
+        user.addCareer(career);
+        //then
+        assertThat(user.getCareers()).extracting("introduction", "startedAt", "endedAt", "position", "name")
+                .contains(Tuple.tuple("my first job", startedAt, endedAt, "대리", "todo company"));
+    }
+
+    @DisplayName("setter 함수 사용시")
+    @Nested
+    class setterTest{
+
+        User user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+        @DisplayName("nickname이 변경된다.")
+        @Test
+        public void nickname() {
+            //given //when
+            user.setNickname("after nickname");
+            //then
+            assertThat(user.getNickname()).isEqualTo("after nickname");
+        }
+
+        @DisplayName("nickname 이 null 이라면 변경하지 않는다.")
+        @Test
+        public void nicknameNull() {
+            //given //when
+            String before = user.getNickname();
+            user.setNickname(null);
+            //then
+            assertThat(user.getNickname())
+                    .isNotNull()
+                    .isEqualTo(before);
+        }
+
+        @DisplayName("introduction 변경된다.")
+        @Test
+        public void introduction() {
+            //given //when
+            user.setIntroduction("after introduction");
+            //then
+            assertThat(user.getIntroduction()).isEqualTo("after introduction");
+        }
+
+        @DisplayName("introduction 이 null 이라면 변경하지 않는다.")
+        @Test
+        public void introductionNull() {
+            //given //when
+            String before = user.getIntroduction();
+            user.setIntroduction(null);
+            //then
+            assertThat(user.getIntroduction())
+                    .isNotNull()
+                    .isEqualTo(before);
+        }
     }
 }

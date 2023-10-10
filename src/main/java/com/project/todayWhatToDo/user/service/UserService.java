@@ -1,12 +1,14 @@
 package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.UserSecurityInfo;
+import com.project.todayWhatToDo.user.domain.Career;
 import com.project.todayWhatToDo.user.domain.User;
-import com.project.todayWhatToDo.user.dto.ModifyUserRequest;
+import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
+import com.project.todayWhatToDo.user.dto.LoginRequestDto;
+import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
 import com.project.todayWhatToDo.user.repository.UserRepository;
-import com.project.todayWhatToDo.user.dto.LoginRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -65,12 +67,28 @@ public class UserService implements UserDetailsService {
                 .build());
     }
 
-    public void modifyUserInfo(ModifyUserRequest request) {
-        Optional<User> user = userRepository.findById(request.id());
-        user.orElseThrow(UserNotFoundException::new);
+    public void modifyUserInfo(ModifyUserRequestDto request) {
 
-        User entity = user.get();
-        if (request.nickname() != null) entity.setNickname(request.nickname());
-        if(request.introduction() != null) entity.setIntroduction(request.introduction());
+        User user = userRepository.findById(request.id())
+                .orElseThrow(UserNotFoundException::new);
+
+        user.setNickname(request.nickname());
+        user.setIntroduction(request.introduction());
+    }
+
+    public void createCareer(CreateCareerRequestDto request) {
+        User user = userRepository.findById(request.userId())
+                .orElseThrow(UserNotFoundException::new);
+
+        user.addCareer(
+                Career.builder()
+                        .user(user)
+                        .name(request.name())
+                        .introduction(request.introduction())
+                        .startedAt(request.startedAt())
+                        .endedAt(request.endedAt())
+                        .position(request.position())
+                        .build()
+        );
     }
 }
