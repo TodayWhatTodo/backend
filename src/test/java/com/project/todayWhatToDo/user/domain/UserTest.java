@@ -141,6 +141,16 @@ public class UserTest {
                     .isEqualTo("after company");
         }
 
+        @DisplayName("프로필 이미지 경로를 변경한다.")
+        @Test
+        public void imagePath() {
+            //given //when
+            user.setImagePath("after image path");
+            //then
+            assertThat(user.getImagePath())
+                    .isEqualTo("after image path");
+        }
+
         @DisplayName("setter input이 null 이라면 변경하지 않는다.")
         @Test
         public void setterWhenNull() {
@@ -148,21 +158,19 @@ public class UserTest {
             String beforeIntroduction = user.getIntroduction();
             String beforeNickname = user.getNickname();
             String beforeCompanyName = user.getCompany().getName();
+            String beforeImagePath = user.getImagePath();
+
             user.setNickname(null);
             user.setIntroduction(null);
             user.setCompany(Company.builder()
-                            .name(null)
+                    .name(null)
                     .build());
+            user.setImagePath(null);
             //then
-            assertThat(user.getIntroduction())
-                    .isNotNull()
-                    .isEqualTo(beforeIntroduction);
-            assertThat(user.getNickname())
-                    .isNotNull()
-                    .isEqualTo(beforeNickname);
-            assertThat(user.getCompany().getName())
-                    .isNotNull()
-                    .isEqualTo(beforeCompanyName);
+            assertThat(user.getIntroduction()).isEqualTo(beforeIntroduction);
+            assertThat(user.getNickname()).isEqualTo(beforeNickname);
+            assertThat(user.getCompany().getName()).isEqualTo(beforeCompanyName);
+            assertThat(user.getImagePath()).isEqualTo(beforeImagePath);
         }
     }
 

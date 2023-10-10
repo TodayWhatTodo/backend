@@ -11,6 +11,7 @@ import com.project.todayWhatToDo.user.login.handler.LoginResponseHandler;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -65,61 +66,10 @@ public class UserServiceTest {
         assertThat(userDetail.getPassword()).isEqualTo("qwerqwer2@");
     }
 
-    @DisplayName("프로필 수정 : 유저 닉네임을 수정하면 변경된다.")
-    @Test
-    public void updateNickname() {
-        //given
-        var findUser = User.builder()
-                .email("today@naver.com")
-                .nickname("today")
-                .password("qwerqwer2@")
-                .name("홍길동")
-                .authority(Authority.COMMON)
-                .build();
-
-        given(userRepository.findById(any()))
-                .willReturn(Optional.of(findUser));
-
-        var request = ModifyUserRequestDto.builder()
-                .id(1L)
-                .nickname("after nickname")
-                .build();
-        //when
-        userService.modifyUserInfo(request);
-        //then
-        assertThat(findUser.getNickname()).isEqualTo("after nickname");
-    }
-
-    @DisplayName("프로필 수정 : 소개글을 수정하면 변경된다.")
-    @Test
-    public void updateIntroduction() {
-        //given
-        var findUser = User.builder()
-                .email("today@naver.com")
-                .nickname("today")
-                .password("qwerqwer2@")
-                .name("홍길동")
-                .authority(Authority.COMMON)
-                .build();
-
-        given(userRepository.findById(any()))
-                .willReturn(Optional.of(findUser));
-
-        var request = ModifyUserRequestDto.builder()
-                .id(1L)
-                .introduction("after self introduction")
-                .build();
-        //when
-        userService.modifyUserInfo(request);
-        //then
-        assertThat(findUser.getIntroduction()).isEqualTo("after self introduction");
-    }
-
-    @DisplayName("프로필 수정 : 재직 중인 회사를 변경할 수 있다.")
-    @Test
-    public void updateCompanyName() {
-        //given
-        var user = User.builder()
+    @DisplayName("프로필 수정")
+    @Nested
+    class ProfileUpdate {
+        User user = User.builder()
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
@@ -129,52 +79,98 @@ public class UserServiceTest {
                         .address("test address")
                         .build())
                 .name("홍길동")
+                .imagePath("before image path")
                 .authority(Authority.COMMON)
                 .build();
 
-        given(userRepository.findById(any()))
-                .willReturn(Optional.of(user));
+        @DisplayName("유저 닉네임 수정시 변경된다.")
+        @Test
+        public void updateNickname() {
+            //given
+            given(userRepository.findById(any()))
+                    .willReturn(Optional.of(user));
 
-        var request = ModifyUserRequestDto.builder()
-                .id(1L)
-                .companyName("bye company")
-                .build();
-        //when
-        userService.modifyUserInfo(request);
-        //then
-        assertThat(user.getCompany()).extracting("name").isEqualTo("bye company");
+            var request = ModifyUserRequestDto.builder()
+                    .id(1L)
+                    .nickname("after nickname")
+                    .build();
+            //when
+            userService.modifyUserInfo(request);
+            //then
+            assertThat(user.getNickname()).isEqualTo("after nickname");
+        }
+
+        @DisplayName("소개글 수정시 변경된다.")
+        @Test
+        public void updateIntroduction() {
+            //given
+            given(userRepository.findById(any()))
+                    .willReturn(Optional.of(user));
+
+            var request = ModifyUserRequestDto.builder()
+                    .id(1L)
+                    .introduction("after self introduction")
+                    .build();
+            //when
+            userService.modifyUserInfo(request);
+            //then
+            assertThat(user.getIntroduction()).isEqualTo("after self introduction");
+        }
+
+        @DisplayName("이미지 경로 수정시 변경된다.")
+        @Test
+        public void updateImagePath() {
+            //given
+            given(userRepository.findById(any()))
+                    .willReturn(Optional.of(user));
+
+            var request = ModifyUserRequestDto.builder()
+                    .id(1L)
+                    .imagePath("after image path")
+                    .build();
+            //when
+            userService.modifyUserInfo(request);
+            //then
+            assertThat(user.getImagePath()).isEqualTo("after image path");
+        }
+
+        @DisplayName("재직 중인 회사를 변경할 수 있다.")
+        @Test
+        public void updateCompanyName() {
+            //given
+            given(userRepository.findById(any()))
+                    .willReturn(Optional.of(user));
+
+            var request = ModifyUserRequestDto.builder()
+                    .id(1L)
+                    .companyName("bye company")
+                    .build();
+            //when
+            userService.modifyUserInfo(request);
+            //then
+            assertThat(user.getCompany()).extracting("name").isEqualTo("bye company");
+        }
+
+        @DisplayName("유저 변경 정보가 null 이라면 수정 하지 않는다.")
+        @Test
+        public void dontUpdate() {
+            //given
+            given(userRepository.findById(any()))
+                    .willReturn(Optional.of(user));
+
+            var request = ModifyUserRequestDto.builder()
+                    .id(1L)
+                    .build();
+            //when
+            userService.modifyUserInfo(request);
+            //then
+            assertThat(user.getNickname()).isEqualTo("today");
+            assertThat(user.getIntroduction()).isEqualTo("today is fun");
+            assertThat(user.getCompany().getName()).isEqualTo("hello company");
+            assertThat(user.getImagePath()).isEqualTo("before image path");
+        }
     }
 
-    @DisplayName("프로필 수정 : 유저 변경 정보가 null 이라면 수정 하지 않는다.")
-    @Test
-    public void dontUpdate() {
-        //given
-        var findUser = User.builder()
-                .email("today@naver.com")
-                .nickname("today")
-                .introduction("today is fun")
-                .password("qwerqwer2@")
-                .company(Company.builder()
-                        .name("hello company")
-                        .address("test address")
-                        .build())
-                .name("홍길동")
-                .authority(Authority.COMMON)
-                .build();
-
-        given(userRepository.findById(any()))
-                .willReturn(Optional.of(findUser));
-
-        var request = ModifyUserRequestDto.builder()
-                .id(1L)
-                .build();
-        //when
-        userService.modifyUserInfo(request);
-        //then
-        assertThat(findUser.getNickname()).isEqualTo("today");
-        assertThat(findUser.getIntroduction()).isEqualTo("today is fun");
-        assertThat(findUser.getCompany().getName()).isEqualTo("hello company");
-    }
 
     @DisplayName("경력 추가 : 회사경력을 추가하면 유저 커리어에 반영된다.")
     @Test

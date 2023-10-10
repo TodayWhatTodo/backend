@@ -86,6 +86,10 @@ public class User {
         if (company != null && company.getName() != null) this.company = company;
     }
 
+    public void setImagePath(String imagePath) {
+        if (imagePath != null) this.imagePath = imagePath;
+    }
+
     public UserSession toSession() {
         return UserSession.builder()
                 .email(email)

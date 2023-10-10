@@ -8,6 +8,7 @@ public record ModifyUserRequestDto(
         String nickname,
         String introduction,
         String companyName,
-        String companyAddress
+        String companyAddress,
+        String imagePath
 ) {
 }

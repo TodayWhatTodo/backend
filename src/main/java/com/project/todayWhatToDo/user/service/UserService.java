@@ -88,6 +88,7 @@ public class UserService implements UserDetailsService {
                 .name(request.companyName())
                 .address(request.companyAddress())
                 .build());
+        user.setImagePath(request.imagePath());
 
     }
 
