@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.project.todayWhatToDo.security.Authority.QUIT;
+
 @Table(name = "USERS")
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -151,5 +153,9 @@ public class User {
                 .introduction(introduction)
                 .nickname(nickname)
                 .build();
+    }
+
+    public void quit() {
+        authority = QUIT;
     }
 }

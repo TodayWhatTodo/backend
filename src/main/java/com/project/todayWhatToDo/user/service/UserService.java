@@ -45,10 +45,9 @@ public class UserService implements UserDetailsService {
         var name = response.getName();
         var password = response.getPassword();
 
-        User user = userRepository.findByEmailAndNameAndPassword(email, name, password)
-                .orElseThrow(UserNotFoundException::new);
-
-        return user.toSession();
+        return userRepository.findByEmailAndNameAndPassword(email, name, password)
+                .orElseThrow(UserNotFoundException::new)
+                .toSession();
     }
 
     private LoginResponseHandler getUserInfo(String provider, String token) {
@@ -71,8 +70,7 @@ public class UserService implements UserDetailsService {
                         .isAcceptAlarm(request.isAcceptAlarm())
                         .imagePath(request.imagePath())
                         .authority(COMMON)
-                        .build()
-                )
+                        .build())
                 .toSession();
     }
 
@@ -97,8 +95,9 @@ public class UserService implements UserDetailsService {
                 .toProfile();
     }
 
-    //todo
-    public Object quitUser(Long userId) {
-        return null;
+    public void quitUser(Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new)
+                .quit();
     }
 }

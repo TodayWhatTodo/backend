@@ -1,7 +1,6 @@
 package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -9,10 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.project.todayWhatToDo.security.Authority.QUIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.groups.Tuple.*;
-import static org.mockito.BDDMockito.*;
+import static org.assertj.core.groups.Tuple.tuple;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.spy;
 
 public class UserTest {
@@ -283,5 +283,21 @@ public class UserTest {
                         "introduction", "position", "company")
                 .containsExactly(user.getImagePath(), user.getFollowerCount(), user.getFollowingCount(), user.getNickname(),
                         user.getIntroduction(), user.getJob().getPosition(), user.getJob().getCompanyName());
+    }
+
+    @DisplayName("탈퇴시 권한은 QUIT으로 변경된다.")
+    @Test
+    public void quit() {
+        // given
+        var user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .build();
+        // when
+        user.quit();
+        // then
+        assertThat(user.getAuthority()).isEqualTo(QUIT);
     }
 }
