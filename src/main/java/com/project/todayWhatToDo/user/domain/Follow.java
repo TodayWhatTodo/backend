@@ -1,5 +1,6 @@
 package com.project.todayWhatToDo.user.domain;
 
+import com.project.todayWhatToDo.user.dto.FollowDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -31,5 +32,19 @@ public class Follow {
     private Follow(User follower, User following) {
         this.follower = follower;
         this.following = following;
+    }
+
+    public void cancel() {
+        follower.reduceFollower();
+        following.reduceFollowing();
+    }
+
+    public FollowDto toDto(){
+        return FollowDto.builder()
+                .followingNickname(following.getNickname())
+                .followingId(following.getId())
+                .followerNickname(follower.getNickname())
+                .followerId(follower.getId())
+                .build();
     }
 }

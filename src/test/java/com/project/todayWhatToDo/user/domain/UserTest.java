@@ -26,6 +26,7 @@ public class UserTest {
         assertThat(user.getFollowerCount()).isZero();
         assertThat(user.getFollowingCount()).isZero();
     }
+
     @DisplayName("getter method test")
     @Test
     void getter() {
@@ -209,5 +210,53 @@ public class UserTest {
         assertThat(session.email()).isEqualTo("today@naver.com");
         assertThat(session.name()).isEqualTo("홍길동");
         assertThat(session.id()).isEqualTo(1L);
+    }
+
+    @DisplayName("reduceFollowing 호출시 팔로잉 수가 1 감소한다.")
+    @Test
+    public void reduceFollowing() {
+        //given
+        User user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .company(Company.builder()
+                        .name("before company")
+                        .address("test address")
+                        .build()
+                )
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+        //when
+        var before = user.getFollowingCount();
+        user.reduceFollowing();
+        //then
+        assertThat(user.getFollowingCount()).isEqualTo(before - 1);
+    }
+
+    @DisplayName("reduceFollower 호출시 팔로워 수가 1 감소한다.")
+    @Test
+    public void reduceFollower() {
+        //given
+        User user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .company(Company.builder()
+                        .name("before company")
+                        .address("test address")
+                        .build()
+                )
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+        //when
+        var before = user.getFollowerCount();
+        user.reduceFollower();
+        //then
+        assertThat(user.getFollowerCount()).isEqualTo(before - 1);
     }
 }
