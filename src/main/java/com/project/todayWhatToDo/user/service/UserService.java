@@ -113,21 +113,25 @@ public class UserService implements UserDetailsService {
         followRepository.delete(follow);
     }
 
+    // todo test
     public Page<FollowDto> followingList(GetFollowingListRequestDto request, Pageable pageable) {
         return followRepository.findByFollowingId(request.userId(), pageable)
                 .map(Follow::toDto);
     }
 
-    public Page<FollowDto> followingList(GetFollowerListRequestDto request, Pageable pageable) {
+    // todo test
+    public Page<FollowDto> followerList(GetFollowerListRequestDto request, Pageable pageable) {
         return followRepository.findByFollowerId(request.userId(), pageable)
                 .map(Follow::toDto);
     }
 
+    // todo test
     public int countFollower(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new)
                 .getFollowerCount();
     }
 
+    // todo test
     public int countFollowing(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new)
                 .getFollowingCount();
