@@ -1,15 +1,15 @@
 package com.project.todayWhatToDo.user.dto;
 
+import lombok.Builder;
+
 import java.time.LocalDateTime;
 
-public record CreateCareerRequestDto(
-        Long userId,
-        String name,
-        String address,
-        String introduction,
+@Builder
+public record UpdateCareerRequestDto(
+        Long careerId,
         LocalDateTime startedAt,
         LocalDateTime endedAt,
+        String introduction,
         String position
 ) {
-
 }

@@ -1,6 +1,9 @@
 package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
+import com.project.todayWhatToDo.user.dto.ProfileResponseDto;
+import com.project.todayWhatToDo.user.dto.UpdateUserSettingRequestDto;
+import com.project.todayWhatToDo.user.dto.UserSession;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,6 +15,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.project.todayWhatToDo.security.Authority.QUIT;
 
 @Table(name = "USERS")
 @Entity
@@ -40,8 +45,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column
     private Authority authority;
-    @Column
-    private String companyName;
+    @Embedded
+    private Job job;
     @Column
     private String imagePath;
     @Column
@@ -53,7 +58,7 @@ public class User {
     @Column
     private Boolean isAcceptAlarm;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Career> careers = new ArrayList<>();
     @OneToMany(mappedBy = "follower")
     private List<Follow> followers = new ArrayList<>();
@@ -61,14 +66,14 @@ public class User {
     private List<Follow> followings = new ArrayList<>();
 
     @Builder
-    private User(String email, String nickname, String password, String name, Authority authority, String companyName, String imagePath, String introduction, Boolean isAcceptAlarm) {
+    private User(String email, String nickname, String password, String name, Authority authority, Job job, String imagePath, String introduction, Boolean isAcceptAlarm) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
         this.name = name;
         this.authority = authority;
-        this.companyName = companyName;
         this.imagePath = imagePath;
+        this.job = job;
         this.introduction = introduction;
         this.followerCount = 0;
         this.followingCount = 0;
@@ -99,8 +104,20 @@ public class User {
         if (introduction != null) this.introduction = introduction;
     }
 
-    public void setCompanyName(String companyName) {
-        if (companyName != null) this.companyName = companyName;
+    public void setJob(Job job) {
+        if (job != null && job.getCompanyName() != null) this.job = job;
+    }
+
+    public void setImagePath(String imagePath) {
+        if (imagePath != null) this.imagePath = imagePath;
+    }
+
+    public UserSession toSession() {
+        return UserSession.builder()
+                .email(email)
+                .name(name)
+                .id(getId())
+                .build();
     }
 
     private void addFollower(Follow follow) {
@@ -125,5 +142,25 @@ public class User {
 
     public void reduceFollowing() {
         followingCount--;
+    }
+
+    public ProfileResponseDto toProfile() {
+        return ProfileResponseDto.builder()
+                .profileImagePath(imagePath)
+                .company(job.getCompanyName())
+                .position(job.getPosition())
+                .followerCount(followerCount)
+                .followingCount(followingCount)
+                .introduction(introduction)
+                .nickname(nickname)
+                .build();
+    }
+
+    public void quit() {
+        authority = QUIT;
+    }
+
+    public void setting(UpdateUserSettingRequestDto request) {
+        isAcceptAlarm = request.isAcceptAlarm();
     }
 }

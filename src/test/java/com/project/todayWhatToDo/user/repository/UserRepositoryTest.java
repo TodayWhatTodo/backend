@@ -3,6 +3,7 @@ package com.project.todayWhatToDo.user.repository;
 import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.user.domain.Career;
+import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("유저 저장소 테스트")
 @Transactional
 public class UserRepositoryTest extends IntegrationTest {
 
@@ -32,6 +34,11 @@ public class UserRepositoryTest extends IntegrationTest {
                 .nickname("today")
                 .password("qwerqwer2@")
                 .name("홍길동")
+                .job(Job.builder()
+                        .companyName("test company")
+                        .address("test address")
+                        .position("신입")
+                        .build())
                 .build());
         //when
         Optional<User> find = repository.findByEmail(user.getEmail());
@@ -59,6 +66,11 @@ public class UserRepositoryTest extends IntegrationTest {
                 .nickname("today")
                 .password("qwerqwer2@")
                 .name("홍길동")
+                .job(Job.builder()
+                        .companyName("test company")
+                        .address("test address")
+                        .position("신입")
+                        .build())
                 .build());
         //when
         Optional<User> find = repository.findByEmailAndNameAndPassword(user.getEmail(), user.getName(), user.getPassword());
@@ -88,6 +100,11 @@ public class UserRepositoryTest extends IntegrationTest {
                 .password("qwerqwer2@")
                 .name("홍길동")
                 .authority(Authority.COMMON)
+                .job(Job.builder()
+                        .companyName("test company")
+                        .address("test address")
+                        .position("신입")
+                        .build())
                 .build());
 
         LocalDateTime startedAt = LocalDateTime.of(2000, 10, 10, 10, 10, 10);
@@ -95,18 +112,26 @@ public class UserRepositoryTest extends IntegrationTest {
 
         var career = Career.builder()
                 .user(user)
-                .name("todo company")
+                .job(Job.builder()
+                        .companyName("todo company")
+                        .address("address")
+                        .position("대리")
+                        .build()
+                )
                 .introduction("my first job")
                 .startedAt(startedAt)
                 .endedAt(endedAt)
-                .position("대리")
                 .build();
         //when
         user.addCareer(career);
         repository.flush();
         //then
-        Career findCareer = em.find(Career.class, career.getId());
-        assertThat(findCareer).extracting("introduction", "startedAt", "endedAt", "position", "name")
-                .containsExactly("my first job", startedAt, endedAt, "대리", "todo company");
+        assertThat(em.find(Career.class, career.getId()))
+                .extracting("introduction", "startedAt", "endedAt", "job")
+                .containsExactly("my first job", startedAt, endedAt, Job.builder()
+                        .companyName("todo company")
+                        .address("address")
+                        .position("대리")
+                        .build());
     }
 }

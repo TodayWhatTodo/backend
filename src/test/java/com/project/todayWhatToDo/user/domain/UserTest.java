@@ -1,16 +1,23 @@
 package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
-import org.assertj.core.groups.Tuple;
+import com.project.todayWhatToDo.user.dto.UpdateUserSettingRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.project.todayWhatToDo.security.Authority.QUIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.tuple;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.spy;
 
 public class UserTest {
 
@@ -80,17 +87,22 @@ public class UserTest {
 
         var career = Career.builder()
                 .user(user)
-                .name("todo company")
+                .job(Job.builder()
+                        .companyName("todo company")
+                        .address("test address")
+                        .position("대리")
+                        .build()
+                )
                 .introduction("my first job")
                 .startedAt(startedAt)
                 .endedAt(endedAt)
-                .position("대리")
                 .build();
         //when
         user.addCareer(career);
         //then
-        assertThat(user.getCareers()).extracting("introduction", "startedAt", "endedAt", "position", "name")
-                .contains(Tuple.tuple("my first job", startedAt, endedAt, "대리", "todo company"));
+        assertThat(user.getCareers())
+                .extracting("introduction", "startedAt", "endedAt", "job.position", "job.companyName", "job.address")
+                .contains(tuple("my first job", startedAt, endedAt, "대리", "todo company", "test address"));
     }
 
     @DisplayName("setter 함수 사용시")
@@ -101,7 +113,10 @@ public class UserTest {
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
-                .companyName("before company")
+                .job(Job.builder()
+                        .companyName("before company")
+                        .address("test address")
+                        .build())
                 .password("qwerqwer2@")
                 .name("홍길동")
                 .authority(Authority.COMMON)
@@ -126,13 +141,27 @@ public class UserTest {
             assertThat(user.getIntroduction()).isEqualTo("after introduction");
         }
 
-        @DisplayName("재직 회사명이 변경된다.")
+        @DisplayName("재직 회사를 변경한다.")
         @Test
-        public void companyName() {
+        public void getCompanyName() {
             //given //when
-            user.setCompanyName("after company");
+            user.setJob(Job.builder()
+                    .companyName("after company")
+                    .address("test address")
+                    .build());
             //then
-            assertThat(user.getCompanyName()).isEqualTo("after company");
+            assertThat(user.getJob()).extracting("companyName")
+                    .isEqualTo("after company");
+        }
+
+        @DisplayName("프로필 이미지 경로를 변경한다.")
+        @Test
+        public void imagePath() {
+            //given //when
+            user.setImagePath("after image path");
+            //then
+            assertThat(user.getImagePath())
+                    .isEqualTo("after image path");
         }
 
         @DisplayName("setter input이 null 이라면 변경하지 않는다.")
@@ -141,16 +170,48 @@ public class UserTest {
             //given //when
             String beforeIntroduction = user.getIntroduction();
             String beforeNickname = user.getNickname();
+            String beforeCompanyName = user.getJob().getCompanyName();
+            String beforeImagePath = user.getImagePath();
+
             user.setNickname(null);
             user.setIntroduction(null);
+            user.setJob(Job.builder()
+                    .companyName(null)
+                    .build());
+            user.setImagePath(null);
             //then
-            assertThat(user.getIntroduction())
-                    .isNotNull()
-                    .isEqualTo(beforeIntroduction);
-            assertThat(user.getNickname())
-                    .isNotNull()
-                    .isEqualTo(beforeNickname);
+            assertThat(user.getIntroduction()).isEqualTo(beforeIntroduction);
+            assertThat(user.getNickname()).isEqualTo(beforeNickname);
+            assertThat(user.getJob().getCompanyName()).isEqualTo(beforeCompanyName);
+            assertThat(user.getImagePath()).isEqualTo(beforeImagePath);
         }
+    }
+
+    @DisplayName("상태 관리가 필요한 데이터를 반환한다.")
+    @Test
+    public void toSession() {
+        //given
+        User user = spy(User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .job(Job.builder()
+                        .companyName("before company")
+                        .address("test address")
+                        .build()
+                )
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build());
+
+        given(user.getId()).willReturn(1L);
+        //when
+        var session = user.toSession();
+        //then
+        assertThat(session.email()).isEqualTo("today@naver.com");
+        assertThat(session.name()).isEqualTo("홍길동");
+        assertThat(session.id()).isEqualTo(1L);
     }
 
     @DisplayName("reduceFollowing 호출시 팔로잉 수가 1 감소한다.")
@@ -161,7 +222,11 @@ public class UserTest {
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
-                .companyName("before company")
+                .job(Job.builder()
+                        .companyName("before company")
+                        .address("test address")
+                        .build()
+                )
                 .password("qwerqwer2@")
                 .name("홍길동")
                 .authority(Authority.COMMON)
@@ -181,7 +246,11 @@ public class UserTest {
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
-                .companyName("before company")
+                .job(Job.builder()
+                        .companyName("before company")
+                        .address("test address")
+                        .build()
+                )
                 .password("qwerqwer2@")
                 .name("홍길동")
                 .authority(Authority.COMMON)
@@ -191,5 +260,68 @@ public class UserTest {
         user.reduceFollower();
         //then
         assertThat(user.getFollowerCount()).isEqualTo(before - 1);
+    }
+
+    @DisplayName("프로필 정보를 담은 객체를 반환한다.")
+    @Test
+    public void toProfile() {
+        //given
+        User user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .job(Job.builder()
+                        .companyName("before company")
+                        .address("test address")
+                        .build()
+                )
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+        //when
+        var profile = user.toProfile();
+        //then
+        assertThat(profile)
+                .extracting("profileImagePath", "followerCount", "followingCount", "nickname",
+                        "introduction", "position", "company")
+                .containsExactly(user.getImagePath(), user.getFollowerCount(), user.getFollowingCount(), user.getNickname(),
+                        user.getIntroduction(), user.getJob().getPosition(), user.getJob().getCompanyName());
+    }
+
+    @DisplayName("탈퇴시 권한은 QUIT으로 변경된다.")
+    @Test
+    public void quit() {
+        // given
+        var user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .build();
+        // when
+        user.quit();
+        // then
+        assertThat(user.getAuthority()).isEqualTo(QUIT);
+    }
+    @DisplayName("알림 설정 변경이 적용된다.")
+    @ParameterizedTest()
+    @ValueSource(booleans = {false, true})
+    public void settingIsAcceptAlarm(boolean acceptAlarmSetting) {
+        // given
+        var user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .build();
+
+        var request = UpdateUserSettingRequestDto.builder()
+                .isAcceptAlarm(acceptAlarmSetting)
+                .build();
+        // when
+        user.setting(request);
+        // then
+        assertThat(user.getIsAcceptAlarm()).isEqualTo(acceptAlarmSetting);
     }
 }

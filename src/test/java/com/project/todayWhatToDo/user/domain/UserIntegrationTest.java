@@ -33,6 +33,11 @@ public class UserIntegrationTest extends IntegrationTest {
                     .nickname("today")
                     .password("qwerqwer2@")
                     .name("홍길동")
+                    .job(Job.builder()
+                            .companyName("test company")
+                            .address("test address")
+                            .position("신입")
+                            .build())
                     .build());
         }
 

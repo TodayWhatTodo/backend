@@ -1,27 +1,19 @@
 package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.UserSecurityInfo;
-import com.project.todayWhatToDo.user.domain.Career;
-import com.project.todayWhatToDo.user.domain.Follow;
+import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.*;
-import com.project.todayWhatToDo.user.exception.FollowNotFountException;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
-import com.project.todayWhatToDo.user.repository.FollowRepository;
+import com.project.todayWhatToDo.user.login.handler.LoginResponseHandler;
 import com.project.todayWhatToDo.user.repository.UserRepository;
-import com.project.todayWhatToDo.user.dto.GetFollowingListRequestDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-import java.util.UUID;
 
 import static com.project.todayWhatToDo.security.Authority.COMMON;
 
@@ -31,7 +23,6 @@ import static com.project.todayWhatToDo.security.Authority.COMMON;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final FollowRepository followRepository;
     private final LoginApiManager loginManager;
 
     @Override
@@ -46,30 +37,41 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    public void login(LoginRequestDto request) {
+    public UserSession login(LoginRequestDto request) {
 
-        var response = loginManager.getProvider(request.oauthProvider())
-                .getUserInfo(request.token());
+        var response = getUserInfo(request.provider(), request.token());
 
         var email = response.getEmail();
         var name = response.getName();
         var password = response.getPassword();
 
-        Optional<User> data = userRepository.findByEmailAndNameAndPassword(email, name, password);
-
-        if (data.isEmpty()) {
-            joinNormalUser(email, name, password);
-        }
+        return userRepository.findByEmailAndNameAndPassword(email, name, password)
+                .orElseThrow(UserNotFoundException::new)
+                .toSession();
     }
 
-    private void joinNormalUser(String email, String name, String password) {
-        userRepository.save(User.builder()
-                .authority(COMMON)
-                .name(name)
-                .nickname(UUID.randomUUID().toString())
-                .password(password)
-                .email(email)
-                .build());
+    private LoginResponseHandler getUserInfo(String provider, String token) {
+        return loginManager.getProvider(provider)
+                .getUserInfo(token);
+    }
+
+    public UserSession joinUser(CreateUserRequestDto request) {
+        var response = getUserInfo(request.provider(), request.token());
+
+        var name = response.getName();
+        var email = response.getEmail();
+        var password = response.getPassword();
+
+        return userRepository.save(User.builder()
+                        .name(name)
+                        .email(email)
+                        .password(password)
+                        .introduction(request.introduction())
+                        .isAcceptAlarm(request.isAcceptAlarm())
+                        .imagePath(request.imagePath())
+                        .authority(COMMON)
+                        .build())
+                .toSession();
     }
 
     public void modifyUserInfo(ModifyUserRequestDto request) {
@@ -79,57 +81,23 @@ public class UserService implements UserDetailsService {
 
         user.setNickname(request.nickname());
         user.setIntroduction(request.introduction());
-        user.setCompanyName(request.companyName());
+        user.setJob(Job.builder()
+                .companyName(request.companyName())
+                .address(request.companyAddress())
+                .build());
+        user.setImagePath(request.imagePath());
+
     }
 
-    public void createCareer(CreateCareerRequestDto request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(UserNotFoundException::new);
-
-        user.addCareer(
-                Career.builder()
-                        .user(user)
-                        .name(request.name())
-                        .introduction(request.introduction())
-                        .startedAt(request.startedAt())
-                        .endedAt(request.endedAt())
-                        .position(request.position())
-                        .build()
-        );
+    public ProfileResponseDto getProfile(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new)
+                .toProfile();
     }
 
-    public void follow(FollowRequestDto request) {
-        var follower = userRepository.findById(request.followerId()).orElseThrow(UserNotFoundException::new);
-        var user = userRepository.findById(request.userId()).orElseThrow(UserNotFoundException::new);
-
-        user.addFollowing(follower);
-    }
-
-    public void followCancel(FollowCancelRequestDto request) {
-        var follow = followRepository.findByFollowerIdAndFollowingId(request.followerId(), request.followingId())
-                .orElseThrow(FollowNotFountException::new);
-
-        follow.cancel();
-        followRepository.delete(follow);
-    }
-
-    public Page<FollowDto> followingList(GetFollowingListRequestDto request, Pageable pageable) {
-        return followRepository.findByFollowingId(request.userId(), pageable)
-                .map(Follow::toDto);
-    }
-
-    public Page<FollowDto> followerList(GetFollowerListRequestDto request, Pageable pageable) {
-        return followRepository.findByFollowerId(request.userId(), pageable)
-                .map(Follow::toDto);
-    }
-
-    public int countFollower(Long userId) {
-        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new)
-                .getFollowerCount();
-    }
-
-    public int countFollowing(Long userId) {
-        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new)
-                .getFollowingCount();
+    public void quitUser(Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new)
+                .quit();
     }
 }

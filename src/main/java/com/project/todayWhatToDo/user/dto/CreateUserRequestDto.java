@@ -3,12 +3,13 @@ package com.project.todayWhatToDo.user.dto;
 import lombok.Builder;
 
 @Builder
-public record ModifyUserRequestDto(
-        Long id,
+public record CreateUserRequestDto(
+        String provider,
+        String token,
         String nickname,
-        String introduction,
         String companyName,
-        String companyAddress,
+        String introduction,
+        Boolean isAcceptAlarm,
         String imagePath
-) {
+        ) {
 }
