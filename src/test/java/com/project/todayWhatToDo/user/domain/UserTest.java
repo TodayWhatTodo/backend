@@ -11,6 +11,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.spy;
 
@@ -82,25 +83,22 @@ public class UserTest {
 
         var career = Career.builder()
                 .user(user)
-                .company(Company.builder()
-                        .name("todo company")
+                .job(Job.builder()
+                        .companyName("todo company")
                         .address("test address")
+                        .position("대리")
                         .build()
                 )
                 .introduction("my first job")
                 .startedAt(startedAt)
                 .endedAt(endedAt)
-                .position("대리")
                 .build();
         //when
         user.addCareer(career);
         //then
-        assertThat(user.getCareers()).extracting("introduction", "startedAt", "endedAt", "position", "company")
-                .contains(Tuple.tuple("my first job", startedAt, endedAt, "대리",
-                        Company.builder()
-                                .name("todo company")
-                                .address("test address")
-                                .build()));
+        assertThat(user.getCareers())
+                .extracting("introduction", "startedAt", "endedAt", "job.position", "job.companyName", "job.address")
+                .contains(tuple("my first job", startedAt, endedAt, "대리", "todo company", "test address"));
     }
 
     @DisplayName("setter 함수 사용시")
@@ -111,8 +109,8 @@ public class UserTest {
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
-                .company(Company.builder()
-                        .name("before company")
+                .job(Job.builder()
+                        .companyName("before company")
                         .address("test address")
                         .build())
                 .password("qwerqwer2@")
@@ -141,14 +139,14 @@ public class UserTest {
 
         @DisplayName("재직 회사를 변경한다.")
         @Test
-        public void company() {
+        public void getCompanyName() {
             //given //when
-            user.setCompany(Company.builder()
-                    .name("after company")
+            user.setJob(Job.builder()
+                    .companyName("after company")
                     .address("test address")
                     .build());
             //then
-            assertThat(user.getCompany()).extracting("name")
+            assertThat(user.getJob()).extracting("companyName")
                     .isEqualTo("after company");
         }
 
@@ -168,19 +166,19 @@ public class UserTest {
             //given //when
             String beforeIntroduction = user.getIntroduction();
             String beforeNickname = user.getNickname();
-            String beforeCompanyName = user.getCompany().getName();
+            String beforeCompanyName = user.getJob().getCompanyName();
             String beforeImagePath = user.getImagePath();
 
             user.setNickname(null);
             user.setIntroduction(null);
-            user.setCompany(Company.builder()
-                    .name(null)
+            user.setJob(Job.builder()
+                    .companyName(null)
                     .build());
             user.setImagePath(null);
             //then
             assertThat(user.getIntroduction()).isEqualTo(beforeIntroduction);
             assertThat(user.getNickname()).isEqualTo(beforeNickname);
-            assertThat(user.getCompany().getName()).isEqualTo(beforeCompanyName);
+            assertThat(user.getJob().getCompanyName()).isEqualTo(beforeCompanyName);
             assertThat(user.getImagePath()).isEqualTo(beforeImagePath);
         }
     }
@@ -193,8 +191,8 @@ public class UserTest {
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
-                .company(Company.builder()
-                        .name("before company")
+                .job(Job.builder()
+                        .companyName("before company")
                         .address("test address")
                         .build()
                 )
@@ -220,8 +218,8 @@ public class UserTest {
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
-                .company(Company.builder()
-                        .name("before company")
+                .job(Job.builder()
+                        .companyName("before company")
                         .address("test address")
                         .build()
                 )
@@ -244,8 +242,8 @@ public class UserTest {
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
-                .company(Company.builder()
-                        .name("before company")
+                .job(Job.builder()
+                        .companyName("before company")
                         .address("test address")
                         .build()
                 )
@@ -258,5 +256,32 @@ public class UserTest {
         user.reduceFollower();
         //then
         assertThat(user.getFollowerCount()).isEqualTo(before - 1);
+    }
+
+    @DisplayName("프로필 정보를 담은 객체를 반환한다.")
+    @Test
+    public void toProfile() {
+        //given
+        User user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .job(Job.builder()
+                        .companyName("before company")
+                        .address("test address")
+                        .build()
+                )
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+        //when
+        var profile = user.toProfile();
+        //then
+        assertThat(profile)
+                .extracting("profileImagePath", "followerCount", "followingCount", "nickname",
+                        "introduction", "position", "company")
+                .containsExactly(user.getImagePath(), user.getFollowerCount(), user.getFollowingCount(), user.getNickname(),
+                        user.getIntroduction(), user.getJob().getPosition(), user.getJob().getCompanyName());
     }
 }

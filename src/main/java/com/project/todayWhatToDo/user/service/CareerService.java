@@ -1,7 +1,7 @@
 package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.user.domain.Career;
-import com.project.todayWhatToDo.user.domain.Company;
+import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
 import com.project.todayWhatToDo.user.dto.UpdateCareerRequestDto;
@@ -27,7 +27,7 @@ public class CareerService {
                 .update(request);
     }
 
-    public void deleteCareer(Long careerId, Long userId){
+    public void deleteCareer(Long careerId, Long userId) {
         careerRepository.deleteByIdAndUserId(careerId, userId);
     }
 
@@ -38,15 +38,15 @@ public class CareerService {
         user.addCareer(
                 Career.builder()
                         .user(user)
-                        .company(Company.builder()
-                                .name(request.name())
+                        .job(Job.builder()
+                                .companyName(request.name())
                                 .address(request.address())
+                                .position(request.position())
                                 .build()
                         )
                         .introduction(request.introduction())
                         .startedAt(request.startedAt())
                         .endedAt(request.endedAt())
-                        .position(request.position())
                         .build()
         );
     }

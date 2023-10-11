@@ -6,6 +6,7 @@ import com.project.todayWhatToDo.notify.dto.CheckNotifyRequestDto;
 import com.project.todayWhatToDo.notify.dto.DeleteNotifyRequestDto;
 import com.project.todayWhatToDo.notify.dto.GetNotifyRequestDto;
 import com.project.todayWhatToDo.notify.repository.NotifyRepository;
+import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -42,6 +43,11 @@ public class NotifyServiceTest extends IntegrationTest {
                 .password("qwerqwer2@")
                 .name("홍길동")
                 .authority(COMMON)
+                .job(Job.builder()
+                        .companyName("test company")
+                        .address("test address")
+                        .position("신입")
+                        .build())
                 .build());
 
         notify1 = notifyRepository.saveAndFlush(Notify.builder()

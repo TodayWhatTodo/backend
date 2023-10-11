@@ -1,6 +1,7 @@
 package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
+import com.project.todayWhatToDo.user.dto.ProfileResponseDto;
 import com.project.todayWhatToDo.user.dto.UserSession;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -42,7 +43,7 @@ public class User {
     @Column
     private Authority authority;
     @Embedded
-    private Company company;
+    private Job job;
     @Column
     private String imagePath;
     @Column
@@ -62,14 +63,14 @@ public class User {
     private List<Follow> followings = new ArrayList<>();
 
     @Builder
-    private User(String email, String nickname, String password, String name, Authority authority, Company company, String imagePath, String introduction, Boolean isAcceptAlarm) {
+    private User(String email, String nickname, String password, String name, Authority authority, Job job, String imagePath, String introduction, Boolean isAcceptAlarm) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
         this.name = name;
         this.authority = authority;
         this.imagePath = imagePath;
-        this.company = company;
+        this.job = job;
         this.introduction = introduction;
         this.followerCount = 0;
         this.followingCount = 0;
@@ -100,8 +101,8 @@ public class User {
         if (introduction != null) this.introduction = introduction;
     }
 
-    public void setCompany(Company company) {
-        if (company != null && company.getName() != null) this.company = company;
+    public void setJob(Job job) {
+        if (job != null && job.getCompanyName() != null) this.job = job;
     }
 
     public void setImagePath(String imagePath) {
@@ -138,5 +139,17 @@ public class User {
 
     public void reduceFollowing() {
         followingCount--;
+    }
+
+    public ProfileResponseDto toProfile() {
+        return ProfileResponseDto.builder()
+                .profileImagePath(imagePath)
+                .company(job.getCompanyName())
+                .position(job.getPosition())
+                .followerCount(followerCount)
+                .followingCount(followingCount)
+                .introduction(introduction)
+                .nickname(nickname)
+                .build();
     }
 }

@@ -2,7 +2,7 @@ package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.security.Authority;
-import com.project.todayWhatToDo.user.domain.Company;
+import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.CreateUserRequestDto;
 import com.project.todayWhatToDo.user.dto.LoginRequestDto;
@@ -57,6 +57,11 @@ public class UserServiceTest extends IntegrationTest {
                     .password("qwerqwer2@")
                     .name("홍길동")
                     .authority(COMMON)
+                    .job(Job.builder()
+                            .companyName("test company")
+                            .address("test address")
+                            .position("신입")
+                            .build())
                     .build());
 
             //when
@@ -104,6 +109,11 @@ public class UserServiceTest extends IntegrationTest {
                     .password("qwerqwer2@")
                     .name("홍길동")
                     .authority(COMMON)
+                    .job(Job.builder()
+                            .companyName("test company")
+                            .address("test address")
+                            .position("신입")
+                            .build())
                     .build());
 
             var request = ModifyUserRequestDto.builder()
@@ -127,9 +137,10 @@ public class UserServiceTest extends IntegrationTest {
                     .nickname("today")
                     .introduction("today is fun")
                     .password("qwerqwer2@")
-                    .company(Company.builder()
-                            .name("hello company")
+                    .job(Job.builder()
+                            .companyName("hello company")
                             .address("test address")
+                            .position("신입")
                             .build())
                     .name("홍길동")
                     .imagePath("before image path")
@@ -155,9 +166,10 @@ public class UserServiceTest extends IntegrationTest {
                     .nickname("today")
                     .introduction("today is fun")
                     .password("qwerqwer2@")
-                    .company(Company.builder()
-                            .name("hello company")
+                    .job(Job.builder()
+                            .companyName("hello company")
                             .address("test address")
+                            .position("신입")
                             .build())
                     .name("홍길동")
                     .imagePath("before image path")
@@ -173,7 +185,7 @@ public class UserServiceTest extends IntegrationTest {
             //then
             assertThat(userRepository.findById(user.getId()))
                     .get()
-                    .extracting("company.name")
+                    .extracting("job.companyName")
                     .isEqualTo("bye company");
         }
 
@@ -186,9 +198,10 @@ public class UserServiceTest extends IntegrationTest {
                     .nickname("today")
                     .introduction("today is fun")
                     .password("qwerqwer2@")
-                    .company(Company.builder()
-                            .name("hello company")
+                    .job(Job.builder()
+                            .companyName("hello company")
                             .address("test address")
+                            .position("신입")
                             .build())
                     .name("홍길동")
                     .authority(COMMON)
@@ -203,7 +216,7 @@ public class UserServiceTest extends IntegrationTest {
             var findUser = userRepository.findById(user.getId()).orElseThrow();
             assertThat(findUser.getNickname()).isEqualTo("today");
             assertThat(findUser.getIntroduction()).isEqualTo("today is fun");
-            assertThat(findUser.getCompany().getName()).isEqualTo("hello company");
+            assertThat(findUser.getJob().getCompanyName()).isEqualTo("hello company");
         }
     }
 
@@ -219,6 +232,11 @@ public class UserServiceTest extends IntegrationTest {
                 .name("홍길동")
                 .password("qwerqwer2@")
                 .authority(COMMON)
+                .job(Job.builder()
+                        .companyName("test company")
+                        .address("test address")
+                        .position("신입")
+                        .build())
                 .build());
 
         var request = new LoginRequestDto("kakao", "test token");
@@ -240,6 +258,11 @@ public class UserServiceTest extends IntegrationTest {
                 .name("홍길동")
                 .password("qwerqwer2@")
                 .authority(COMMON)
+                .job(Job.builder()
+                        .companyName("test company")
+                        .address("test address")
+                        .position("신입")
+                        .build())
                 .build());
 
         var request = new LoginRequestDto("kakao", "test token");
@@ -250,7 +273,6 @@ public class UserServiceTest extends IntegrationTest {
 
     private void mockingGetUserInfo(String email, String name, String password) {
         var loginProvider = mock(LoginApiProvider.class);
-
         given(loginApiManager.getProvider(any()))
                 .willReturn(loginProvider);
 
@@ -281,5 +303,33 @@ public class UserServiceTest extends IntegrationTest {
         //then
         assertThat(session).extracting("email", "name")
                 .containsExactly("hello@naver.com", "홍길동");
+    }
+
+    @DisplayName("프로필 조회시 유저의 정보를 반환한다.")
+    @Test
+    public void getProfile() {
+        //given
+        var user = userRepository.saveAndFlush(User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .job(Job.builder()
+                        .companyName("before company")
+                        .address("test address")
+                        .position("신입")
+                        .build()
+                )
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build());
+        //when
+        var profile = userService.getProfile(user.getId());
+        //then
+        assertThat(profile)
+                .extracting("profileImagePath", "followerCount", "followingCount", "nickname",
+                        "introduction", "position", "company")
+                .containsExactly(user.getImagePath(), user.getFollowerCount(), user.getFollowingCount(), user.getNickname(),
+                        user.getIntroduction(), user.getJob().getPosition(), user.getJob().getCompanyName());
     }
 }

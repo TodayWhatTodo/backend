@@ -20,10 +20,10 @@ public class CareerTest {
                 .startedAt(LocalDateTime.of(2000, 1, 1, 1, 1, 1))
                 .endedAt(LocalDateTime.of(2099, 1, 1, 1, 1, 1))
                 .introduction("first introduction")
-                .position("신입")
                 .user(null)
-                .company(Company.builder()
-                        .name("아무개 회사")
+                .job(Job.builder()
+                        .position("신입")
+                        .companyName("아무개 회사")
                         .address("서울 강남구")
                         .build())
                 .build();
@@ -102,7 +102,7 @@ public class CareerTest {
             //when
             career.update(request);
             //then
-            assertThat(career).extracting("introduction", "startedAt", "endedAt", "position")
+            assertThat(career).extracting("introduction", "startedAt", "endedAt", "job.position")
                     .doesNotContainNull();
         }
     }

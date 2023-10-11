@@ -1,12 +1,9 @@
 package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.UserSecurityInfo;
-import com.project.todayWhatToDo.user.domain.Company;
+import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
-import com.project.todayWhatToDo.user.dto.CreateUserRequestDto;
-import com.project.todayWhatToDo.user.dto.LoginRequestDto;
-import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
-import com.project.todayWhatToDo.user.dto.UserSession;
+import com.project.todayWhatToDo.user.dto.*;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
 import com.project.todayWhatToDo.user.login.handler.LoginResponseHandler;
@@ -86,12 +83,22 @@ public class UserService implements UserDetailsService {
 
         user.setNickname(request.nickname());
         user.setIntroduction(request.introduction());
-        user.setCompany(Company.builder()
-                .name(request.companyName())
+        user.setJob(Job.builder()
+                .companyName(request.companyName())
                 .address(request.companyAddress())
                 .build());
         user.setImagePath(request.imagePath());
 
     }
 
+    public ProfileResponseDto getProfile(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new)
+                .toProfile();
+    }
+
+    //todo
+    public Object quitUser(Long userId) {
+        return null;
+    }
 }

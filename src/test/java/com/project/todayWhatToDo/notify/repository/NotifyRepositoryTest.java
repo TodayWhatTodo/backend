@@ -2,6 +2,7 @@ package com.project.todayWhatToDo.notify.repository;
 
 import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.notify.domain.Notify;
+import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.assertj.core.groups.Tuple;
@@ -29,12 +30,18 @@ public class NotifyRepositoryTest extends IntegrationTest {
     User user;
     Notify notify1;
     Notify notify2;
+
     @BeforeEach
-    public void saveData(){
+    public void saveData() {
         user = userRepository.saveAndFlush(User.builder()
                 .email("today@naver.com")
                 .nickname("today")
                 .introduction("today is fun")
+                .job(Job.builder()
+                        .address("test address")
+                        .position("신입")
+                        .companyName("test company")
+                        .build())
                 .password("qwerqwer2@")
                 .name("홍길동")
                 .authority(COMMON)
@@ -50,6 +57,7 @@ public class NotifyRepositoryTest extends IntegrationTest {
                 .content("test message2")
                 .build());
     }
+
     @DisplayName("특정 유저에게 온 알람을 목록을 조회할 수 있다.")
     @Test
     public void findByUserId() {
@@ -64,7 +72,7 @@ public class NotifyRepositoryTest extends IntegrationTest {
                         Tuple.tuple(user.getId(), "test message2")
                 );
     }
-    
+
     @DisplayName("알람을 삭제한다.")
     @Test
     public void deleteAllByIdAndUserId() {

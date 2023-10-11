@@ -2,6 +2,7 @@ package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.user.domain.Career;
+import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
 import com.project.todayWhatToDo.user.dto.UpdateCareerRequestDto;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import static com.project.todayWhatToDo.security.Authority.COMMON;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("경력 서비스 테스트")
 @Transactional
 public class CareerServiceTest extends IntegrationTest {
 
@@ -39,6 +41,11 @@ public class CareerServiceTest extends IntegrationTest {
                 .password("qwerqwer2@")
                 .name("홍길동")
                 .authority(COMMON)
+                .job(Job.builder()
+                        .companyName("test company")
+                        .address("test address")
+                        .position("신입")
+                        .build())
                 .build());
 
         var startedAt = LocalDateTime.of(2000, 10, 10, 10, 10, 10);
@@ -47,7 +54,7 @@ public class CareerServiceTest extends IntegrationTest {
         //when
         careerService.createCareer(request);
         //then
-        assertThat(user.getCareers()).extracting("introduction", "startedAt", "endedAt", "position")
+        assertThat(user.getCareers()).extracting("introduction", "startedAt", "endedAt", "job.position")
                 .contains(Tuple.tuple("my first job", startedAt, endedAt, "대리"));
 
     }
@@ -61,11 +68,21 @@ public class CareerServiceTest extends IntegrationTest {
                 .nickname("hello")
                 .name("홍길동")
                 .password("test")
+                .job(Job.builder()
+                        .companyName("test company")
+                        .address("test address")
+                        .position("신입")
+                        .build())
                 .build());
 
         var career = careerRepository.saveAndFlush(Career.builder()
                 .startedAt(LocalDateTime.of(2000, 1, 1, 0, 0, 0))
                 .user(user)
+                .job(Job.builder()
+                        .companyName("test company")
+                        .address("test address")
+                        .position("신입")
+                        .build())
                 .build());
 
         var req = UpdateCareerRequestDto.builder()
@@ -81,7 +98,7 @@ public class CareerServiceTest extends IntegrationTest {
         assertThat(careerRepository.findByIdAndUserId(career.getId(), user.getId()))
                 .isNotEmpty()
                 .get()
-                .extracting("startedAt", "endedAt", "user.id", "introduction", "position")
+                .extracting("startedAt", "endedAt", "user.id", "introduction", "job.position")
                 .containsExactly(req.startedAt(), req.endedAt(), user.getId(), req.introduction(), req.position());
     }
 
@@ -94,11 +111,21 @@ public class CareerServiceTest extends IntegrationTest {
                 .nickname("hello")
                 .name("홍길동")
                 .password("test")
+                .job(Job.builder()
+                        .companyName("test company")
+                        .address("test address")
+                        .position("신입")
+                        .build())
                 .build());
 
         var career = careerRepository.saveAndFlush(Career.builder()
                 .startedAt(LocalDateTime.of(2000, 1, 1, 0, 0, 0))
                 .user(user)
+                .job(Job.builder()
+                        .companyName("test company")
+                        .address("test address")
+                        .position("신입")
+                        .build())
                 .build());
         //when
         careerService.deleteCareer(career.getId(), user.getId());

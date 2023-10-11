@@ -2,6 +2,7 @@ package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.user.domain.Follow;
+import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.*;
 import com.project.todayWhatToDo.user.repository.FollowRepository;
@@ -45,6 +46,11 @@ public class FollowServiceTest extends IntegrationTest {
                     .password("qwerqwer2@")
                     .name("홍길동")
                     .authority(COMMON)
+                    .job(Job.builder()
+                            .companyName("test company")
+                            .address("test address")
+                            .position("신입")
+                            .build())
                     .build());
 
             userA = userRepository.saveAndFlush(User.builder()
@@ -54,6 +60,11 @@ public class FollowServiceTest extends IntegrationTest {
                     .password("qwerqwer2@")
                     .name("홍길동")
                     .authority(COMMON)
+                    .job(Job.builder()
+                            .companyName("test company")
+                            .address("test address")
+                            .position("신입")
+                            .build())
                     .build());
 
             userC = userRepository.saveAndFlush(User.builder()
@@ -63,6 +74,11 @@ public class FollowServiceTest extends IntegrationTest {
                     .password("qwerqwer2@")
                     .name("홍길동")
                     .authority(COMMON)
+                    .job(Job.builder()
+                            .companyName("test company")
+                            .address("test address")
+                            .position("신입")
+                            .build())
                     .build());
         }
 

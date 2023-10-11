@@ -21,31 +21,28 @@ public class Career {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     @Embedded
-    private Company company;
+    private Job job;
     @Column
     private String introduction;
     @Column(nullable = false)
     private LocalDateTime startedAt;
     @Column
     private LocalDateTime endedAt;
-    @Column
-    private String position;
 
     @Builder
-    private Career(User user, Company company, String introduction, LocalDateTime startedAt, LocalDateTime endedAt, String position) {
+    private Career(User user, Job job, String introduction, LocalDateTime startedAt, LocalDateTime endedAt) {
         this.user = user;
-        this.company = company;
+        this.job = job;
         this.introduction = introduction;
         this.startedAt = startedAt;
         this.endedAt = endedAt;
-        this.position = position;
     }
 
     public void update(UpdateCareerRequestDto request) {
         if (request.startedAt() != null) startedAt = request.startedAt();
         if (request.endedAt() != null) endedAt = request.endedAt();
         if (request.introduction() != null) introduction = request.introduction();
-        if (request.position() != null) position = request.position();
+        if (job != null) job.setPosition(request.position());
 
         validation();
     }
