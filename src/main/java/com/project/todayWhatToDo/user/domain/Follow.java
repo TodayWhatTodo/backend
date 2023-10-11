@@ -32,4 +32,9 @@ public class Follow {
         this.follower = follower;
         this.following = following;
     }
+
+    public void cancel() {
+        follower.reduceFollower();
+        following.reduceFollowing();
+    }
 }

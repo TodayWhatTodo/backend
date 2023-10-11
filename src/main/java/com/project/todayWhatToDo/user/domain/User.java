@@ -119,4 +119,11 @@ public class User {
         follower.addFollower(follow);
     }
 
+    public void reduceFollower() {
+        followerCount--;
+    }
+
+    public void reduceFollowing() {
+        followingCount--;
+    }
 }

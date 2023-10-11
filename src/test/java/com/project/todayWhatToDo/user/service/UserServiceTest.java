@@ -1,17 +1,19 @@
 package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.Authority;
+import com.project.todayWhatToDo.user.domain.Follow;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
+import com.project.todayWhatToDo.user.dto.FollowCancelRequestDto;
 import com.project.todayWhatToDo.user.dto.FollowRequestDto;
 import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
+import com.project.todayWhatToDo.user.repository.FollowRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -20,16 +22,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 @DisplayName("유저 서비스 테스트")
 public class UserServiceTest {
 
     UserRepository userRepository;
+    FollowRepository followRepository;
     UserService userService;
 
     public UserServiceTest() {
-        userRepository = Mockito.mock(UserRepository.class);
-        userService = new UserService(userRepository, new LoginApiManager());
+        userRepository = mock(UserRepository.class);
+        followRepository = mock(FollowRepository.class);
+
+        userService = new UserService(userRepository, followRepository, new LoginApiManager());
     }
 
     @Test
@@ -199,7 +205,7 @@ public class UserServiceTest {
 
     @Nested
     @DisplayName("팔로우")
-    class Follow {
+    class FollowTest {
         @DisplayName("팔로우 : 팔로우 등록시 팔로잉 유저의 팔로잉 수가 1 증가하고 팔로워 유저의 팔로워 수가 1 증가한다.")
         @Test
         public void follow() {
@@ -234,6 +240,47 @@ public class UserServiceTest {
             //then
             assertThat(followingUser.getFollowingCount()).isOne();
             assertThat(follower.getFollowerCount()).isOne();
+        }
+
+        @DisplayName("팔로우 취소시 팔로워 수와 팔로잉 수가 줄어든다.")
+        @Test
+        public void followCancel() {
+            //given
+            var follower = User.builder()
+                    .email("today@naver.com")
+                    .nickname("today")
+                    .introduction("today is fun")
+                    .password("qwerqwer2@")
+                    .name("홍길동")
+                    .authority(Authority.COMMON)
+                    .build();
+
+            var followingUser = User.builder()
+                    .email("today@naver.com")
+                    .nickname("today")
+                    .introduction("today is fun")
+                    .password("qwerqwer2@")
+                    .name("홍길동")
+                    .authority(Authority.COMMON)
+                    .build();
+
+            var follow = Follow.builder()
+                    .following(followingUser)
+                    .follower(follower)
+                    .build();
+
+            given(followRepository.findByFollowerIdAndFollowingId(any(), any()))
+                    .willReturn(Optional.of(follow));
+
+            var request = FollowCancelRequestDto.builder()
+                    .followerId(follower.getId())
+                    .followingId(followingUser.getId())
+                    .build();
+            //when
+            userService.followCancel(request);
+            //then
+            assertThat(follower.getFollowerCount()).isEqualTo(-1);
+            assertThat(followingUser.getFollowingCount()).isEqualTo(-1);
         }
     }
 }
