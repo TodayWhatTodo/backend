@@ -1,9 +1,12 @@
 package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
+import com.project.todayWhatToDo.user.dto.UpdateUserSettingRequestDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +15,7 @@ import static com.project.todayWhatToDo.security.Authority.QUIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.groups.Tuple.tuple;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.spy;
 
@@ -299,5 +303,25 @@ public class UserTest {
         user.quit();
         // then
         assertThat(user.getAuthority()).isEqualTo(QUIT);
+    }
+    @DisplayName("알림 설정 변경이 적용된다.")
+    @ParameterizedTest()
+    @ValueSource(booleans = {false, true})
+    public void settingIsAcceptAlarm(boolean acceptAlarmSetting) {
+        // given
+        var user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .build();
+
+        var request = UpdateUserSettingRequestDto.builder()
+                .isAcceptAlarm(acceptAlarmSetting)
+                .build();
+        // when
+        user.setting(request);
+        // then
+        assertThat(user.getIsAcceptAlarm()).isEqualTo(acceptAlarmSetting);
     }
 }

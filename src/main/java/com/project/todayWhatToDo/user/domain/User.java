@@ -2,6 +2,7 @@ package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.user.dto.ProfileResponseDto;
+import com.project.todayWhatToDo.user.dto.UpdateUserSettingRequestDto;
 import com.project.todayWhatToDo.user.dto.UserSession;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -157,5 +158,9 @@ public class User {
 
     public void quit() {
         authority = QUIT;
+    }
+
+    public void setting(UpdateUserSettingRequestDto request) {
+        isAcceptAlarm = request.isAcceptAlarm();
     }
 }
