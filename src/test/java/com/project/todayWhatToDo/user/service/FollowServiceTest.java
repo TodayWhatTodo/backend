@@ -14,10 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.project.todayWhatToDo.security.Authority.COMMON;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Transactional
 public class FollowServiceTest extends IntegrationTest {
 
     @Autowired
