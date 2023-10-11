@@ -1,5 +1,6 @@
 package com.project.todayWhatToDo.user.domain;
 
+import com.project.todayWhatToDo.user.dto.UpdateCareerRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,5 +39,18 @@ public class Career {
         this.startedAt = startedAt;
         this.endedAt = endedAt;
         this.position = position;
+    }
+
+    public void update(UpdateCareerRequestDto request) {
+        if (request.startedAt() != null) startedAt = request.startedAt();
+        if (request.endedAt() != null) endedAt = request.endedAt();
+        if (request.introduction() != null) introduction = request.introduction();
+        if (request.position() != null) position = request.position();
+
+        validation();
+    }
+
+    private void validation(){
+        if(endedAt != null && startedAt.isAfter(endedAt)) throw new IllegalArgumentException("입사일이 퇴사일보다 큽니다.");
     }
 }

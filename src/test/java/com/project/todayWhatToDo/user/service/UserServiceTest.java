@@ -75,7 +75,6 @@ public class UserServiceTest {
     @DisplayName("프로필")
     class Profile {
 
-
         @DisplayName("수정 : 유저 닉네임을 수정하면 변경된다.")
         @Test
         public void updateNickname() {
