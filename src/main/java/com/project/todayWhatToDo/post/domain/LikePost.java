@@ -3,6 +3,7 @@ package com.project.todayWhatToDo.post.domain;
 import com.project.todayWhatToDo.BaseTimeEntity;
 import com.project.todayWhatToDo.user.domain.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,7 +28,9 @@ public class LikePost extends BaseTimeEntity {
         this.post = post;
     }
 
-    public void setUser(User user) {
+    @Builder
+    public LikePost(User user, Post post) {
         this.user = user;
+        this.post = post;
     }
 }
