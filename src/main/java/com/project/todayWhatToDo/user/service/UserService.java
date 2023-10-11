@@ -111,4 +111,14 @@ public class UserService implements UserDetailsService {
                         .build()
         );
     }
+
+    public void follow(FollowRequestDto request){
+        var follower = userRepository.findById(request.followerId()).orElseThrow(UserNotFoundException::new);
+        var user = userRepository.findById(request.userId()).orElseThrow(UserNotFoundException::new);
+
+        user.addFollowing(follower);
+    }
+
+    public void followCancel(){
+    }
 }

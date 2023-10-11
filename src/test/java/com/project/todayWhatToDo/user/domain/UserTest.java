@@ -16,6 +16,16 @@ import static org.mockito.Mockito.spy;
 
 public class UserTest {
 
+
+    @DisplayName("팔로워 수와 팔로잉 수의 초기 값은 0이다.")
+    @Test
+    public void defaultFollowCacheValue() {
+        //given
+        var user = User.builder().build();
+        //when //then
+        assertThat(user.getFollowerCount()).isZero();
+        assertThat(user.getFollowingCount()).isZero();
+    }
     @DisplayName("getter method test")
     @Test
     void getter() {

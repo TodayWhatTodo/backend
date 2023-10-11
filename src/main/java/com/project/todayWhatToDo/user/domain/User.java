@@ -48,10 +48,18 @@ public class User {
     @Column
     private String introduction;
     @Column
+    private Integer followerCount;
+    @Column
+    private Integer followingCount;
+    @Column
     private Boolean isAcceptAlarm;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Career> careers = new ArrayList<>();
+    @OneToMany(mappedBy = "follower")
+    private List<Follow> followers = new ArrayList<>();
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followings = new ArrayList<>();
 
     @Builder
     private User(String email, String nickname, String password, String name, Authority authority, Company company, String imagePath, String introduction, Boolean isAcceptAlarm) {
@@ -60,9 +68,12 @@ public class User {
         this.password = password;
         this.name = name;
         this.authority = authority;
+        this.companyName = companyName;
         this.imagePath = imagePath;
         this.company = company;
         this.introduction = introduction;
+        this.followerCount = 0;
+        this.followingCount = 0;
         this.isAcceptAlarm = isAcceptAlarm;
     }
 
@@ -72,6 +83,14 @@ public class User {
 
     public List<Career> getCareers() {
         return careers.stream().toList();
+    }
+
+    public List<Follow> getFollowers() {
+        return followers.stream().toList();
+    }
+
+    public List<Follow> getFollowings() {
+        return followings.stream().toList();
     }
 
     public void setNickname(String nickname) {
@@ -97,4 +116,21 @@ public class User {
                 .id(getId())
                 .build();
     }
+
+    private void addFollower(Follow follow) {
+        followerCount++;
+        followers.add(follow);
+    }
+
+    public void addFollowing(User follower) {
+        this.followingCount++;
+        Follow follow = Follow.builder()
+                .following(this)
+                .follower(follower)
+                .build();
+
+        followings.add(follow);
+        follower.addFollower(follow);
+    }
+
 }

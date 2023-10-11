@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
+@DisplayName("유저 서비스 테스트")
 public class UserServiceTest {
 
     UserRepository userRepository;
@@ -45,50 +46,50 @@ public class UserServiceTest {
                 .hasMessage("홍길동" + " 이름을 가진 유저는 존재하지 않습니다.");
     }
 
-    @DisplayName("로그인 진행을 위한 토큰을 발급 받으면 이메일과 비밀번호를 조회할 수 있다.")
-    @Test
-    public void loadUserByUsername() {
-        //given
-        var findUser = User.builder()
-                .email("today@naver.com")
-                .nickname("today")
-                .password("qwerqwer2@")
-                .name("홍길동")
-                .authority(Authority.COMMON)
-                .build();
+    @Nested
+    @DisplayName("로그인")
+    class Login {
+        @DisplayName("로그인 진행을 위한 토큰을 발급 받으면 이메일과 비밀번호를 조회할 수 있다.")
+        @Test
+        public void loadUserByUsername() {
+            //given
+            var findUser = User.builder()
+                    .email("today@naver.com")
+                    .nickname("today")
+                    .password("qwerqwer2@")
+                    .name("홍길동")
+                    .authority(Authority.COMMON)
+                    .build();
 
-        given(userRepository.findByName(any()))
-                .willReturn(Optional.of(findUser));
-        //when
-        var userDetail = userService.loadUserByUsername("홍길동");
-        //then
-        assertThat(userDetail.getUsername()).isEqualTo("today@naver.com");
-        assertThat(userDetail.getPassword()).isEqualTo("qwerqwer2@");
+            given(userRepository.findByName(any()))
+                    .willReturn(Optional.of(findUser));
+            //when
+            var userDetail = userService.loadUserByUsername("홍길동");
+            //then
+            assertThat(userDetail.getUsername()).isEqualTo("today@naver.com");
+            assertThat(userDetail.getPassword()).isEqualTo("qwerqwer2@");
+        }
     }
 
-    @DisplayName("프로필 수정")
     @Nested
-    class ProfileUpdate {
-        User user = User.builder()
-                .email("today@naver.com")
-                .nickname("today")
-                .introduction("today is fun")
-                .password("qwerqwer2@")
-                .company(Company.builder()
-                        .name("hello company")
-                        .address("test address")
-                        .build())
-                .name("홍길동")
-                .imagePath("before image path")
-                .authority(Authority.COMMON)
-                .build();
+    @DisplayName("프로필")
+    class Profile {
 
-        @DisplayName("유저 닉네임 수정시 변경된다.")
+
+        @DisplayName("수정 : 유저 닉네임을 수정하면 변경된다.")
         @Test
         public void updateNickname() {
             //given
+            var findUser = User.builder()
+                    .email("today@naver.com")
+                    .nickname("today")
+                    .password("qwerqwer2@")
+                    .name("홍길동")
+                    .authority(Authority.COMMON)
+                    .build();
+
             given(userRepository.findById(any()))
-                    .willReturn(Optional.of(user));
+                    .willReturn(Optional.of(findUser));
 
             var request = ModifyUserRequestDto.builder()
                     .id(1L)
@@ -97,30 +98,53 @@ public class UserServiceTest {
             //when
             userService.modifyUserInfo(request);
             //then
-            assertThat(user.getNickname()).isEqualTo("after nickname");
+            assertThat(findUser.getNickname()).isEqualTo("after nickname");
         }
 
-        @DisplayName("소개글 수정시 변경된다.")
+        @DisplayName("수정 : 소개글을 수정하면 변경된다.")
         @Test
         public void updateIntroduction() {
             //given
-            given(userRepository.findById(any()))
-                    .willReturn(Optional.of(user));
+            var findUser = User.builder()
+                    .email("today@naver.com")
+                    .nickname("today")
+                    .password("qwerqwer2@")
+                    .name("홍길동")
+                    .authority(Authority.COMMON)
+                    .build();
 
+            given(userRepository.findById(any()))
+                    .willReturn(Optional.of(findUser));
             var request = ModifyUserRequestDto.builder()
                     .id(1L)
                     .introduction("after self introduction")
+                    .imagePath("after image path")
                     .build();
             //when
             userService.modifyUserInfo(request);
             //then
-            assertThat(user.getIntroduction()).isEqualTo("after self introduction");
+            assertThat(findUser.getIntroduction()).isEqualTo("after self introduction");
         }
+
 
         @DisplayName("이미지 경로 수정시 변경된다.")
         @Test
         public void updateImagePath() {
             //given
+            var user = User.builder()
+                    .email("today@naver.com")
+                    .nickname("today")
+                    .introduction("today is fun")
+                    .password("qwerqwer2@")
+                    .company(Company.builder()
+                            .name("hello company")
+                            .address("test address")
+                            .build())
+                    .name("홍길동")
+                    .imagePath("before image path")
+                    .authority(Authority.COMMON)
+                    .build();
+
             given(userRepository.findById(any()))
                     .willReturn(Optional.of(user));
 
@@ -134,15 +158,28 @@ public class UserServiceTest {
             assertThat(user.getImagePath()).isEqualTo("after image path");
         }
 
-        @DisplayName("재직 중인 회사를 변경할 수 있다.")
+        @DisplayName("수정 : 재직 중인 회사를 변경할 수 있다.")
         @Test
         public void updateCompanyName() {
             //given
+            var user = User.builder()
+                    .email("today@naver.com")
+                    .nickname("today")
+                    .introduction("today is fun")
+                    .password("qwerqwer2@")
+                    .company(Company.builder()
+                            .name("hello company")
+                            .address("test address")
+                            .build())
+                    .name("홍길동")
+                    .imagePath("before image path")
+                    .authority(Authority.COMMON)
+                    .build();
+
             given(userRepository.findById(any()))
                     .willReturn(Optional.of(user));
 
             var request = ModifyUserRequestDto.builder()
-                    .id(1L)
                     .companyName("bye company")
                     .build();
             //when
@@ -151,52 +188,105 @@ public class UserServiceTest {
             assertThat(user.getCompany()).extracting("name").isEqualTo("bye company");
         }
 
-        @DisplayName("유저 변경 정보가 null 이라면 수정 하지 않는다.")
+        @DisplayName("수정 : 유저 변경 정보가 null 이라면 수정 하지 않는다.")
         @Test
         public void dontUpdate() {
             //given
-            given(userRepository.findById(any()))
-                    .willReturn(Optional.of(user));
-
-            var request = ModifyUserRequestDto.builder()
-                    .id(1L)
+            var findUser = User.builder()
+                    .email("today@naver.com")
+                    .nickname("today")
+                    .introduction("today is fun")
+                    .password("qwerqwer2@")
+                    .company(Company.builder()
+                            .name("hello company")
+                            .address("test address")
+                            .build())
+                    .name("홍길동")
+                    .authority(Authority.COMMON)
                     .build();
+
+            given(userRepository.findById(any()))
+                    .willReturn(Optional.of(findUser));
+
+            var request = ModifyUserRequestDto.builder().build();
             //when
             userService.modifyUserInfo(request);
             //then
-            assertThat(user.getNickname()).isEqualTo("today");
-            assertThat(user.getIntroduction()).isEqualTo("today is fun");
-            assertThat(user.getCompany().getName()).isEqualTo("hello company");
-            assertThat(user.getImagePath()).isEqualTo("before image path");
+            assertThat(findUser.getNickname()).isEqualTo("today");
+            assertThat(findUser.getIntroduction()).isEqualTo("today is fun");
+            assertThat(findUser.getCompany().getName()).isEqualTo("hello company");
         }
     }
 
+    @Nested
+    @DisplayName("경력 사항")
+    class Career {
+        @DisplayName("추가 : 회사경력을 추가하면 유저 커리어에 반영된다.")
+        @Test
+        public void createCareer() {
+            //given
+            var user = User.builder()
+                    .email("today@naver.com")
+                    .nickname("today")
+                    .introduction("today is fun")
+                    .password("qwerqwer2@")
+                    .name("홍길동")
+                    .authority(Authority.COMMON)
+                    .build();
 
-    @DisplayName("경력 추가 : 회사경력을 추가하면 유저 커리어에 반영된다.")
-    @Test
-    public void createCareer() {
-        //given
-        var user = User.builder()
-                .email("today@naver.com")
-                .nickname("today")
-                .introduction("today is fun")
-                .password("qwerqwer2@")
-                .name("홍길동")
-                .authority(Authority.COMMON)
-                .build();
+            given(userRepository.findById(any()))
+                    .willReturn(Optional.of(user));
 
-        given(userRepository.findById(any()))
-                .willReturn(Optional.of(user));
+            var startedAt = LocalDateTime.of(2000, 10, 10, 10, 10, 10);
+            var endedAt = LocalDateTime.of(2001, 10, 10, 10, 10, 10);
+            var request = new CreateCareerRequestDto(1L, "todo company", "test address", "my first job", startedAt, endedAt, "대리");
+            //when
+            userService.createCareer(request);
+            //then
+            assertThat(user.getCareers()).extracting("introduction", "startedAt", "endedAt", "position")
+                    .contains(Tuple.tuple("my first job", startedAt, endedAt, "대리"));
 
-        var startedAt = LocalDateTime.of(2000, 10, 10, 10, 10, 10);
-        var endedAt = LocalDateTime.of(2001, 10, 10, 10, 10, 10);
-        var request = new CreateCareerRequestDto(1L, "todo company", "test address", "my first job", startedAt, endedAt, "대리");
-        //when
-        userService.createCareer(request);
-        //then
-        assertThat(user.getCareers()).extracting("introduction", "startedAt", "endedAt", "position")
-                .contains(Tuple.tuple("my first job", startedAt, endedAt, "대리"));
+        }
+    }
 
+    @Nested
+    @DisplayName("팔로우")
+    class Follow {
+        @DisplayName("팔로우 : 팔로우 등록시 팔로잉 유저의 팔로잉 수가 1 증가하고 팔로워 유저의 팔로워 수가 1 증가한다.")
+        @Test
+        public void follow() {
+            //given
+            var follower = User.builder()
+                    .email("today@naver.com")
+                    .nickname("today")
+                    .introduction("today is fun")
+                    .password("qwerqwer2@")
+                    .name("홍길동")
+                    .authority(Authority.COMMON)
+                    .build();
+
+            var followingUser = User.builder()
+                    .email("today@naver.com")
+                    .nickname("today")
+                    .introduction("today is fun")
+                    .password("qwerqwer2@")
+                    .name("홍길동")
+                    .authority(Authority.COMMON)
+                    .build();
+
+            given(userRepository.findById(1L)).willReturn(Optional.of(follower));
+            given(userRepository.findById(2L)).willReturn(Optional.of(followingUser));
+
+            var request = FollowRequestDto.builder()
+                    .followerId(1L)
+                    .userId(2L)
+                    .build();
+            //when
+            userService.follow(request);
+            //then
+            assertThat(followingUser.getFollowingCount()).isOne();
+            assertThat(follower.getFollowerCount()).isOne();
+        }
     }
 
     @DisplayName("로그인 : 로그인 성공시 예외가 발생하지 않는다")
