@@ -101,7 +101,6 @@ public class UserService implements UserDetailsService {
         user.addFollowing(follower);
     }
 
-    //todo
     public void followCancel(){
     }
 }
