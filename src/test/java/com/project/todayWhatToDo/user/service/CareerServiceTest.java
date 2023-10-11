@@ -3,9 +3,11 @@ package com.project.todayWhatToDo.user.service;
 import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.user.domain.Career;
 import com.project.todayWhatToDo.user.domain.User;
+import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
 import com.project.todayWhatToDo.user.dto.UpdateCareerRequestDto;
 import com.project.todayWhatToDo.user.repository.CareerRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static com.project.todayWhatToDo.security.Authority.COMMON;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
@@ -24,6 +27,30 @@ public class CareerServiceTest extends IntegrationTest {
     CareerRepository careerRepository;
     @Autowired
     UserRepository userRepository;
+
+    @DisplayName("추가 : 회사경력을 추가하면 유저 커리어에 반영된다.")
+    @Test
+    public void createCareer() {
+        //given
+        var user = userRepository.saveAndFlush(User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(COMMON)
+                .build());
+
+        var startedAt = LocalDateTime.of(2000, 10, 10, 10, 10, 10);
+        var endedAt = LocalDateTime.of(2001, 10, 10, 10, 10, 10);
+        var request = new CreateCareerRequestDto(user.getId(), "todo company", "test address", "my first job", startedAt, endedAt, "대리");
+        //when
+        careerService.createCareer(request);
+        //then
+        assertThat(user.getCareers()).extracting("introduction", "startedAt", "endedAt", "position")
+                .contains(Tuple.tuple("my first job", startedAt, endedAt, "대리"));
+
+    }
 
     @DisplayName("경력 사항을 변경할 수 있다.")
     @Test

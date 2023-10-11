@@ -1,29 +1,24 @@
 package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.UserSecurityInfo;
-import com.project.todayWhatToDo.user.domain.Career;
 import com.project.todayWhatToDo.user.domain.Company;
-import com.project.todayWhatToDo.user.domain.Follow;
 import com.project.todayWhatToDo.user.domain.User;
-import com.project.todayWhatToDo.user.dto.*;
-import com.project.todayWhatToDo.user.dto.*;
-import com.project.todayWhatToDo.user.exception.FollowNotFountException;
+import com.project.todayWhatToDo.user.dto.CreateUserRequestDto;
+import com.project.todayWhatToDo.user.dto.LoginRequestDto;
+import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
+import com.project.todayWhatToDo.user.dto.UserSession;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
-import com.project.todayWhatToDo.user.repository.FollowRepository;
 import com.project.todayWhatToDo.user.login.handler.LoginResponseHandler;
 import com.project.todayWhatToDo.user.repository.UserRepository;
-import com.project.todayWhatToDo.user.dto.GetFollowingListRequestDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.project.todayWhatToDo.security.Authority.*;
+import static com.project.todayWhatToDo.security.Authority.COMMON;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +26,6 @@ import static com.project.todayWhatToDo.security.Authority.*;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final FollowRepository followRepository;
     private final LoginApiManager loginManager;
 
     @Override
@@ -100,58 +94,4 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public void createCareer(CreateCareerRequestDto request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(UserNotFoundException::new);
-
-        user.addCareer(
-                Career.builder()
-                        .user(user)
-                        .company(Company.builder()
-                                .name(request.name())
-                                .address(request.address())
-                                .build()
-                        )
-                        .introduction(request.introduction())
-                        .startedAt(request.startedAt())
-                        .endedAt(request.endedAt())
-                        .position(request.position())
-                        .build()
-        );
-    }
-
-    public void follow(FollowRequestDto request) {
-        var follower = userRepository.findById(request.followerId()).orElseThrow(UserNotFoundException::new);
-        var user = userRepository.findById(request.userId()).orElseThrow(UserNotFoundException::new);
-
-        user.addFollowing(follower);
-    }
-
-    public void followCancel(FollowCancelRequestDto request) {
-        var follow = followRepository.findByFollowerIdAndFollowingId(request.followerId(), request.followingId())
-                .orElseThrow(FollowNotFountException::new);
-
-        follow.cancel();
-        followRepository.delete(follow);
-    }
-
-    public Page<FollowDto> followingList(GetFollowingListRequestDto request, Pageable pageable) {
-        return followRepository.findByFollowingId(request.userId(), pageable)
-                .map(Follow::toDto);
-    }
-
-    public Page<FollowDto> followerList(GetFollowerListRequestDto request, Pageable pageable) {
-        return followRepository.findByFollowerId(request.userId(), pageable)
-                .map(Follow::toDto);
-    }
-
-    public int countFollower(Long userId) {
-        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new)
-                .getFollowerCount();
-    }
-
-    public int countFollowing(Long userId) {
-        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new)
-                .getFollowingCount();
-    }
 }
