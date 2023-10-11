@@ -21,4 +21,8 @@ public class CareerService {
                 .orElseThrow(CareerNotFoundException::new)
                 .update(request);
     }
+
+    public void deleteCareer(Long careerId, Long userId){
+        careerRepository.deleteByIdAndUserId(careerId, userId);
+    }
 }

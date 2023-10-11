@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,5 +55,27 @@ public class CareerServiceTest extends IntegrationTest {
                 .get()
                 .extracting("startedAt", "endedAt", "user.id", "introduction", "position")
                 .containsExactly(req.startedAt(), req.endedAt(), user.getId(), req.introduction(), req.position());
+    }
+
+    @DisplayName("경력 삭제시 데이터가 삭제된다")
+    @Test
+    public void delete() {
+        //given
+        var user = userRepository.saveAndFlush(User.builder()
+                .email("test@naver.com")
+                .nickname("hello")
+                .name("홍길동")
+                .password("test")
+                .build());
+
+        var career = careerRepository.saveAndFlush(Career.builder()
+                .startedAt(LocalDateTime.of(2000, 1, 1, 0, 0, 0))
+                .user(user)
+                .build());
+        //when
+        careerService.deleteCareer(career.getId(), user.getId());
+        //then
+        assertThat(careerRepository.findByIdAndUserId(career.getId(), user.getId()))
+                .isEmpty();
     }
 }

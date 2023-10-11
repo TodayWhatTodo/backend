@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface CareerRepository extends JpaRepository<Career, Long> {
     Optional<Career> findByIdAndUserId(Long careerId, Long userId);
+
+    void deleteByIdAndUserId(Long careerId, Long userId);
 }
