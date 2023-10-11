@@ -2,6 +2,7 @@ package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.UserSecurityInfo;
 import com.project.todayWhatToDo.user.domain.Career;
+import com.project.todayWhatToDo.user.domain.Follow;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.*;
 import com.project.todayWhatToDo.user.exception.FollowNotFountException;
@@ -9,7 +10,10 @@ import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
 import com.project.todayWhatToDo.user.repository.FollowRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
+import com.project.todayWhatToDo.user.dto.GetFollowingListRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -107,5 +111,25 @@ public class UserService implements UserDetailsService {
 
         follow.cancel();
         followRepository.delete(follow);
+    }
+
+    public Page<FollowDto> followingList(GetFollowingListRequestDto request, Pageable pageable) {
+        return followRepository.findByFollowingId(request.userId(), pageable)
+                .map(Follow::toDto);
+    }
+
+    public Page<FollowDto> followingList(GetFollowerListRequestDto request, Pageable pageable) {
+        return followRepository.findByFollowerId(request.userId(), pageable)
+                .map(Follow::toDto);
+    }
+
+    public int countFollower(Long userId) {
+        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new)
+                .getFollowerCount();
+    }
+
+    public int countFollowing(Long userId) {
+        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new)
+                .getFollowingCount();
     }
 }
