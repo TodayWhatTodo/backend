@@ -1,5 +1,6 @@
 package com.project.todayWhatToDo.user.domain;
 
+import com.project.todayWhatToDo.post.domain.LikePost;
 import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.user.dto.ProfileResponseDto;
 import com.project.todayWhatToDo.user.dto.UpdateUserSettingRequestDto;
@@ -64,6 +65,15 @@ public class User {
     private List<Follow> followers = new ArrayList<>();
     @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follow> followings = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LikePost> likePosts = new ArrayList<>();
+
+    public void  addPost(LikePost likePost) {
+        this.likePosts.add(likePost);
+        likePost.setUser(this);
+    }
 
     @Builder
     private User(String email, String nickname, String password, String name, Authority authority, Job job, String imagePath, String introduction, Boolean isAcceptAlarm) {
