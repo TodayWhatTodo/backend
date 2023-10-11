@@ -1,49 +1,40 @@
 package com.project.todayWhatToDo.user.service;
 
-import com.project.todayWhatToDo.security.Authority;
+import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.user.domain.Follow;
 import com.project.todayWhatToDo.user.domain.User;
-import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
-import com.project.todayWhatToDo.user.dto.FollowCancelRequestDto;
-import com.project.todayWhatToDo.user.dto.FollowRequestDto;
-import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
-import com.project.todayWhatToDo.user.login.LoginApiManager;
+import com.project.todayWhatToDo.user.dto.*;
 import com.project.todayWhatToDo.user.repository.FollowRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.assertj.core.groups.Tuple;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static com.project.todayWhatToDo.security.Authority.COMMON;
+import static org.assertj.core.api.Assertions.*;
 
+@Transactional
 @DisplayName("유저 서비스 테스트")
-public class UserServiceTest {
+public class UserServiceTest extends IntegrationTest {
 
+    @Autowired
     UserRepository userRepository;
+    @Autowired
     FollowRepository followRepository;
+    @Autowired
     UserService userService;
-
-    public UserServiceTest() {
-        userRepository = mock(UserRepository.class);
-        followRepository = mock(FollowRepository.class);
-
-        userService = new UserService(userRepository, followRepository, new LoginApiManager());
-    }
 
     @Test
     public void loadUserByUsernameWhenFail() {
-        //given
-        given(userRepository.findByName(any()))
-                .willReturn(Optional.empty());
-        //when //then
+        //given //when //then
         assertThatThrownBy(() -> userService.loadUserByUsername("홍길동"))
                 .hasMessage("홍길동" + " 이름을 가진 유저는 존재하지 않습니다.");
     }
@@ -55,16 +46,14 @@ public class UserServiceTest {
         @Test
         public void loadUserByUsername() {
             //given
-            var findUser = User.builder()
+            var findUser = userRepository.save(User.builder()
                     .email("today@naver.com")
                     .nickname("today")
                     .password("qwerqwer2@")
                     .name("홍길동")
-                    .authority(Authority.COMMON)
-                    .build();
+                    .authority(COMMON)
+                    .build());
 
-            given(userRepository.findByName(any()))
-                    .willReturn(Optional.of(findUser));
             //when
             var userDetail = userService.loadUserByUsername("홍길동");
             //then
@@ -81,91 +70,83 @@ public class UserServiceTest {
         @Test
         public void updateNickname() {
             //given
-            var findUser = User.builder()
+            var user = userRepository.save(User.builder()
                     .email("today@naver.com")
                     .nickname("today")
                     .password("qwerqwer2@")
                     .name("홍길동")
-                    .authority(Authority.COMMON)
-                    .build();
+                    .authority(COMMON)
+                    .build());
 
-            given(userRepository.findById(any()))
-                    .willReturn(Optional.of(findUser));
-
-            var request = new ModifyUserRequestDto(1L, "after nickname", null, null);
+            var request = new ModifyUserRequestDto(user.getId(), "after nickname", null, null);
             //when
             userService.modifyUserInfo(request);
             //then
-            assertThat(findUser.getNickname()).isEqualTo("after nickname");
+            assertThat(userRepository.findById(user.getId()).orElseThrow()
+                    .getNickname()).isEqualTo("after nickname");
         }
 
         @DisplayName("수정 : 소개글을 수정하면 변경된다.")
         @Test
         public void updateIntroduction() {
             //given
-            var findUser = User.builder()
+            var user = userRepository.saveAndFlush(User.builder()
                     .email("today@naver.com")
                     .nickname("today")
                     .password("qwerqwer2@")
                     .name("홍길동")
-                    .authority(Authority.COMMON)
-                    .build();
+                    .authority(COMMON)
+                    .build());
 
-            given(userRepository.findById(any()))
-                    .willReturn(Optional.of(findUser));
-
-            var request = new ModifyUserRequestDto(1L, null, "after self introduction", null);
+            var request = new ModifyUserRequestDto(user.getId(), null, "after self introduction", null);
             //when
             userService.modifyUserInfo(request);
             //then
-            assertThat(findUser.getIntroduction()).isEqualTo("after self introduction");
+            assertThat(userRepository.findById(user.getId()).orElseThrow()
+                    .getIntroduction()).isEqualTo("after self introduction");
         }
 
         @DisplayName("수정 : 재직 중인 회사를 변경할 수 있다.")
         @Test
         public void updateCompanyName() {
             //given
-            var user = User.builder()
+            var user = userRepository.saveAndFlush(User.builder()
                     .email("today@naver.com")
                     .nickname("today")
                     .introduction("today is fun")
                     .password("qwerqwer2@")
                     .companyName("hello company")
                     .name("홍길동")
-                    .authority(Authority.COMMON)
-                    .build();
+                    .authority(COMMON)
+                    .build());
 
-            given(userRepository.findById(any()))
-                    .willReturn(Optional.of(user));
-
-            var request = new ModifyUserRequestDto(1L, null, null, "bye company");
+            var request = new ModifyUserRequestDto(user.getId(), null, null, "bye company");
             //when
             userService.modifyUserInfo(request);
             //then
-            assertThat(user.getCompanyName()).isEqualTo("bye company");
+            assertThat(userRepository.findById(user.getId()).orElseThrow()
+                    .getCompanyName()).isEqualTo("bye company");
         }
 
         @DisplayName("수정 : 유저 변경 정보가 null 이라면 수정 하지 않는다.")
         @Test
-        public void dontUpdate() {
+        public void doNotUpdate() {
             //given
-            var findUser = User.builder()
+            var user = userRepository.saveAndFlush(User.builder()
                     .email("today@naver.com")
                     .nickname("today")
                     .introduction("today is fun")
                     .password("qwerqwer2@")
                     .companyName("hello company")
                     .name("홍길동")
-                    .authority(Authority.COMMON)
-                    .build();
+                    .authority(COMMON)
+                    .build());
 
-            given(userRepository.findById(any()))
-                    .willReturn(Optional.of(findUser));
-
-            var request = new ModifyUserRequestDto(1L, null, null, null);
+            var request = new ModifyUserRequestDto(user.getId(), null, null, null);
             //when
             userService.modifyUserInfo(request);
             //then
+            var findUser = userRepository.findById(user.getId()).orElseThrow();
             assertThat(findUser.getNickname()).isEqualTo("today");
             assertThat(findUser.getIntroduction()).isEqualTo("today is fun");
             assertThat(findUser.getCompanyName()).isEqualTo("hello company");
@@ -179,21 +160,18 @@ public class UserServiceTest {
         @Test
         public void createCareer() {
             //given
-            var user = User.builder()
+            var user = userRepository.saveAndFlush(User.builder()
                     .email("today@naver.com")
                     .nickname("today")
                     .introduction("today is fun")
                     .password("qwerqwer2@")
                     .name("홍길동")
-                    .authority(Authority.COMMON)
-                    .build();
-
-            given(userRepository.findById(any()))
-                    .willReturn(Optional.of(user));
+                    .authority(COMMON)
+                    .build());
 
             var startedAt = LocalDateTime.of(2000, 10, 10, 10, 10, 10);
             var endedAt = LocalDateTime.of(2001, 10, 10, 10, 10, 10);
-            var request = new CreateCareerRequestDto(1L, "todo company", "my first job", startedAt, endedAt, "대리");
+            var request = new CreateCareerRequestDto(user.getId(), "todo company", "my first job", startedAt, endedAt, "대리");
             //when
             userService.createCareer(request);
             //then
@@ -206,81 +184,173 @@ public class UserServiceTest {
     @Nested
     @DisplayName("팔로우")
     class FollowTest {
+
+        User userA, userB, userC;
+
+
+        @BeforeEach
+        void init() {
+            userB = userRepository.saveAndFlush(User.builder()
+                    .email("user1@naver.com")
+                    .nickname("user1")
+                    .introduction("today is fun")
+                    .password("qwerqwer2@")
+                    .name("홍길동")
+                    .authority(COMMON)
+                    .build());
+
+            userA = userRepository.saveAndFlush(User.builder()
+                    .email("user2@naver.com")
+                    .nickname("user2")
+                    .introduction("today is fun")
+                    .password("qwerqwer2@")
+                    .name("홍길동")
+                    .authority(COMMON)
+                    .build());
+
+            userC = userRepository.saveAndFlush(User.builder()
+                    .email("user3@naver.com")
+                    .nickname("user3")
+                    .introduction("today is fun")
+                    .password("qwerqwer2@")
+                    .name("홍길동")
+                    .authority(COMMON)
+                    .build());
+        }
+
         @DisplayName("팔로우 : 팔로우 등록시 팔로잉 유저의 팔로잉 수가 1 증가하고 팔로워 유저의 팔로워 수가 1 증가한다.")
         @Test
         public void follow() {
             //given
-            var follower = User.builder()
-                    .email("today@naver.com")
-                    .nickname("today")
-                    .introduction("today is fun")
-                    .password("qwerqwer2@")
-                    .name("홍길동")
-                    .authority(Authority.COMMON)
-                    .build();
-
-            var followingUser = User.builder()
-                    .email("today@naver.com")
-                    .nickname("today")
-                    .introduction("today is fun")
-                    .password("qwerqwer2@")
-                    .name("홍길동")
-                    .authority(Authority.COMMON)
-                    .build();
-
-            given(userRepository.findById(1L)).willReturn(Optional.of(follower));
-            given(userRepository.findById(2L)).willReturn(Optional.of(followingUser));
-
             var request = FollowRequestDto.builder()
-                    .followerId(1L)
-                    .userId(2L)
+                    .followerId(userB.getId())
+                    .userId(userA.getId())
                     .build();
             //when
             userService.follow(request);
             //then
-            assertThat(followingUser.getFollowingCount()).isOne();
-            assertThat(follower.getFollowerCount()).isOne();
+            assertThat(userA.getFollowingCount()).isOne();
+            assertThat(userB.getFollowerCount()).isOne();
         }
 
         @DisplayName("팔로우 취소시 팔로워 수와 팔로잉 수가 줄어든다.")
         @Test
         public void followCancel() {
             //given
-            var follower = User.builder()
-                    .email("today@naver.com")
-                    .nickname("today")
-                    .introduction("today is fun")
-                    .password("qwerqwer2@")
-                    .name("홍길동")
-                    .authority(Authority.COMMON)
-                    .build();
-
-            var followingUser = User.builder()
-                    .email("today@naver.com")
-                    .nickname("today")
-                    .introduction("today is fun")
-                    .password("qwerqwer2@")
-                    .name("홍길동")
-                    .authority(Authority.COMMON)
-                    .build();
-
-            var follow = Follow.builder()
-                    .following(followingUser)
-                    .follower(follower)
-                    .build();
-
-            given(followRepository.findByFollowerIdAndFollowingId(any(), any()))
-                    .willReturn(Optional.of(follow));
+            var follow = followRepository.saveAndFlush(Follow.builder()
+                    .following(userA)
+                    .follower(userB)
+                    .build());
 
             var request = FollowCancelRequestDto.builder()
-                    .followerId(follower.getId())
-                    .followingId(followingUser.getId())
+                    .followerId(userB.getId())
+                    .followingId(userA.getId())
                     .build();
             //when
             userService.followCancel(request);
             //then
-            assertThat(follower.getFollowerCount()).isEqualTo(-1);
-            assertThat(followingUser.getFollowingCount()).isEqualTo(-1);
+            assertThat(userB.getFollowerCount()).isEqualTo(-1);
+            assertThat(userA.getFollowingCount()).isEqualTo(-1);
+        }
+
+        @DisplayName("팔로잉 목록을 조회한다.")
+        @Test
+        public void followingList() {
+            //given
+            var user = userA;
+            follow(user, userB);
+            follow(user, userC);
+
+            var request = GetFollowingListRequestDto.builder()
+                    .userId(user.getId())
+                    .build();
+
+            var pageable = PageRequest.of(0, 100);
+            //when
+            Page<FollowDto> list = userService.followingList(request, pageable);
+            //then
+            assertThat(list).extracting("followingId", "followerId", "followerNickname", "followingNickname")
+                    .containsExactly(
+                            Tuple.tuple(user.getId(), userB.getId(), userB.getNickname(), user.getNickname()),
+                            Tuple.tuple(user.getId(), userC.getId(), userC.getNickname(), user.getNickname())
+                    );
+        }
+
+        @DisplayName("팔로워 목록을 조회한다.")
+        @Test
+        public void followerList() {
+            //given
+            var follower = userB;
+
+            follow(userA, follower);
+            follow(userC, follower);
+
+            var request = GetFollowerListRequestDto.builder()
+                    .userId(follower.getId())
+                    .build();
+
+            var pageable = PageRequest.of(0, 100);
+            //when
+            Page<FollowDto> list = userService.followerList(request, pageable);
+            //then
+            assertThat(list).extracting("followingId", "followerId", "followerNickname", "followingNickname")
+                    .containsExactly(
+                            Tuple.tuple(userA.getId(), follower.getId(), follower.getNickname(), userA.getNickname()),
+                            Tuple.tuple(userC.getId(), follower.getId(), follower.getNickname(), userC.getNickname())
+                    );
+        }
+
+        @DisplayName("팔로잉이 없는 유저가 팔로잉 수를 조회할 때는 0을 반환한다")
+        @Test
+        public void countFollowing() {
+            //given //when
+            int count = userService.countFollowing(userA.getId());
+            //then
+            assertThat(count).isZero();
+        }
+
+        @DisplayName("팔로잉을 추가한 이후 팔로잉 수 증가가 반영되어 반환한다")
+        @Test
+        public void countFollowingWithFollow() {
+            // given
+            userService.follow(FollowRequestDto.builder()
+                    .userId(userA.getId())
+                    .followerId(userC.getId())
+                    .build());
+            // when
+            int count = userService.countFollowing(userA.getId());
+            // then
+            assertThat(count).isOne();
+        }
+
+        @DisplayName("팔로잉이 없는 유저가 팔로잉 수를 조회할 때는 0을 반환한다")
+        @Test
+        public void countFollower() {
+            //given //when
+            int count = userService.countFollower(userA.getId());
+            //then
+            assertThat(count).isZero();
+        }
+
+        @DisplayName("팔로잉을 추가한 이후 팔로잉 수 증가가 반영되어 반환한다")
+        @Test
+        public void countFollowerWithFollow() {
+            // given
+            userService.follow(FollowRequestDto.builder()
+                    .userId(userC.getId())
+                    .followerId(userA.getId())
+                    .build());
+            // when
+            int count = userService.countFollower(userA.getId());
+            // then
+            assertThat(count).isOne();
+        }
+
+        private void follow(User from, User to) {
+            followRepository.saveAndFlush(Follow.builder()
+                    .following(from)
+                    .follower(to)
+                    .build());
         }
     }
 }
