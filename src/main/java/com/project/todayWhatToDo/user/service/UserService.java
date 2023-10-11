@@ -2,6 +2,7 @@ package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.security.UserSecurityInfo;
 import com.project.todayWhatToDo.user.domain.Career;
+import com.project.todayWhatToDo.user.domain.Company;
 import com.project.todayWhatToDo.user.domain.Follow;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.*;

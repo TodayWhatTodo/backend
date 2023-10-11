@@ -1,8 +1,8 @@
 package com.project.todayWhatToDo.user.service;
 
+import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.user.domain.Company;
-import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.user.domain.Follow;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.*;
@@ -10,7 +10,6 @@ import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
 import com.project.todayWhatToDo.user.login.LoginApiProvider;
 import com.project.todayWhatToDo.user.login.handler.LoginResponseHandler;
-import com.project.todayWhatToDo.user.dto.*;
 import com.project.todayWhatToDo.user.repository.FollowRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.assertj.core.groups.Tuple;
@@ -19,19 +18,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
+import static com.project.todayWhatToDo.security.Authority.COMMON;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static com.project.todayWhatToDo.security.Authority.COMMON;
-import static org.assertj.core.api.Assertions.*;
 
 @Transactional
 @DisplayName("유저 서비스 테스트")
@@ -43,6 +43,7 @@ public class UserServiceTest extends IntegrationTest {
     FollowRepository followRepository;
     @Autowired
     UserService userService;
+    @MockBean
     LoginApiManager loginApiManager;
 
     @Test
@@ -92,7 +93,7 @@ public class UserServiceTest extends IntegrationTest {
                     .build());
 
             var request = ModifyUserRequestDto.builder()
-                    .id(1L)
+                    .id(user.getId())
                     .nickname("after nickname")
                     .build();
             //when
@@ -173,6 +174,7 @@ public class UserServiceTest extends IntegrationTest {
                     .build());
 
             var request = ModifyUserRequestDto.builder()
+                    .id(user.getId())
                     .companyName("bye company")
                     .build();
             //when
@@ -201,7 +203,9 @@ public class UserServiceTest extends IntegrationTest {
                     .authority(COMMON)
                     .build());
 
-            var request = ModifyUserRequestDto.builder().build();
+            var request = ModifyUserRequestDto.builder()
+                    .id(user.getId())
+                    .build();
             //when
             userService.modifyUserInfo(request);
             //then
@@ -418,14 +422,16 @@ public class UserServiceTest extends IntegrationTest {
     public void loginSuccess() {
         //given
         mockingGetUserInfo("today@naver.com", "홍길동", "qwerqwer2@");
+
+        userRepository.saveAndFlush(User.builder()
+                .email("today@naver.com")
+                .name("홍길동")
+                .password("qwerqwer2@")
+                .authority(COMMON)
+                .build());
+
         var request = new LoginRequestDto("kakao", "test token");
 
-        given(userRepository
-                .findByEmailAndNameAndPassword("today@naver.com", "홍길동", "qwerqwer2@"))
-                .willReturn(Optional.of(User.builder()
-                        .email("today@naver.com")
-                        .name("홍길동")
-                        .build()));
         //when //then
         var session = userService.login(request);
         assertThat(session).extracting("email", "name")
@@ -437,11 +443,15 @@ public class UserServiceTest extends IntegrationTest {
     public void loginFail() {
         //given
         mockingGetUserInfo("today@naver.com", "홍길", "qwerqwer2@");
-        var request = new LoginRequestDto("kakao", "test token");
 
-        given(userRepository
-                .findByEmailAndNameAndPassword("today@naver.com", "홍길동", "qwerqwer2@"))
-                .willReturn(Optional.of(User.builder().build()));
+        userRepository.saveAndFlush(User.builder()
+                .email("today@naver.com")
+                .name("홍길동")
+                .password("qwerqwer2@")
+                .authority(COMMON)
+                .build());
+
+        var request = new LoginRequestDto("kakao", "test token");
         //when //then
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(UserNotFoundException.class);
@@ -474,9 +484,6 @@ public class UserServiceTest extends IntegrationTest {
                 .build();
 
         mockingGetUserInfo("hello@naver.com", "홍길동", "qwerqwer2@");
-
-        given(userRepository.save(any()))
-                .willAnswer((mock) -> mock.getArgument(0));
 
         //when
         var session = userService.joinUser(request);

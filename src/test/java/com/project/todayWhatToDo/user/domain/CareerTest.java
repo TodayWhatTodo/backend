@@ -1,15 +1,14 @@
 package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.user.dto.UpdateCareerRequestDto;
-import org.assertj.core.api.AbstractStringAssert;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("회사 경력 도메인 테스트")
 public class CareerTest {
