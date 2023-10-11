@@ -14,6 +14,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class UserTest {
 
+
+    @DisplayName("팔로워 수와 팔로잉 수의 초기 값은 0이다.")
+    @Test
+    public void defaultFollowCacheValue() {
+        //given
+        var user = User.builder().build();
+        //when //then
+        assertThat(user.getFollowerCount()).isZero();
+        assertThat(user.getFollowingCount()).isZero();
+    }
+
     @DisplayName("getter method test")
     @Test
     void getter() {
@@ -84,7 +95,7 @@ public class UserTest {
 
     @DisplayName("setter 함수 사용시")
     @Nested
-    class setterTest{
+    class setterTest {
 
         User user = User.builder()
                 .email("today@naver.com")
@@ -95,6 +106,7 @@ public class UserTest {
                 .name("홍길동")
                 .authority(Authority.COMMON)
                 .build();
+
         @DisplayName("nickname이 변경된다.")
         @Test
         public void nickname() {
@@ -139,5 +151,45 @@ public class UserTest {
                     .isNotNull()
                     .isEqualTo(beforeNickname);
         }
+    }
+
+    @DisplayName("reduceFollowing 호출시 팔로잉 수가 1 감소한다.")
+    @Test
+    public void reduceFollowing() {
+        //given
+        User user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .companyName("before company")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+        //when
+        var before = user.getFollowingCount();
+        user.reduceFollowing();
+        //then
+        assertThat(user.getFollowingCount()).isEqualTo(before - 1);
+    }
+
+    @DisplayName("reduceFollower 호출시 팔로워 수가 1 감소한다.")
+    @Test
+    public void reduceFollower() {
+        //given
+        User user = User.builder()
+                .email("today@naver.com")
+                .nickname("today")
+                .introduction("today is fun")
+                .companyName("before company")
+                .password("qwerqwer2@")
+                .name("홍길동")
+                .authority(Authority.COMMON)
+                .build();
+        //when
+        var before = user.getFollowerCount();
+        user.reduceFollower();
+        //then
+        assertThat(user.getFollowerCount()).isEqualTo(before - 1);
     }
 }

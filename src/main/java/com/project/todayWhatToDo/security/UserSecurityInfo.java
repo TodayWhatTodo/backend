@@ -10,11 +10,11 @@ import java.util.List;
 
 public class UserSecurityInfo implements UserDetails {
 
-    private String email;
+    private final String email;
 
-    private String password;
+    private final String password;
 
-    private Collection<? extends GrantedAuthority> authorities;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     @Builder
     private UserSecurityInfo(String email, String password, String authority) {
