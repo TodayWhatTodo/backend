@@ -68,7 +68,6 @@ public class User {
         this.password = password;
         this.name = name;
         this.authority = authority;
-        this.companyName = companyName;
         this.imagePath = imagePath;
         this.company = company;
         this.introduction = introduction;
