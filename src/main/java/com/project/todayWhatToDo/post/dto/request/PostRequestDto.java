@@ -1,5 +1,6 @@
 package com.project.todayWhatToDo.post.dto.request;
 
+import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,22 +13,23 @@ import lombok.NoArgsConstructor;
 @Getter
 public class PostRequestDto {
 
+    private Long id;
     private String author;
     private String title;
-    private PostStatus postStatus;
+    private PostStatus status;
     private String content;
     private String category;
-    private Integer likeCount;
+    private Integer like;
 
 
-    public PostRequestDto toEntity() {
-        return PostRequestDto.builder()
+    public Post toEntity() {
+        return Post.builder()
                 .author(author)
                 .title(title)
-                .postStatus(postStatus)
+                .status(status)
                 .content(content)
                 .category(category)
-                .likeCount(likeCount)
+                .like(like)
                 .build();
     }
 

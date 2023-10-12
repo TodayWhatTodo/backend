@@ -34,7 +34,7 @@ public class Post extends BaseTimeEntity {
     private String author;
 
     @Column
-    private Integer likeCount;
+    private Integer like;
 
     @Column(length = 20)
     private String category;
@@ -44,9 +44,9 @@ public class Post extends BaseTimeEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private PostStatus postStatus;
+    private PostStatus status;
 
-    public void addPost(User user) {
+    public void addLikePost(User user) {
         this.likePosts.add(LikePost.builder()
                 .user(user)
                 .post(this)
@@ -58,18 +58,18 @@ public class Post extends BaseTimeEntity {
     public Post(String author, String title, Integer like, String category, String content, PostStatus status) {
         this.author = author;
         this.title = title;
-        this.likeCount = like;
+        this.like = like;
         this.category = category;
         this.content = content;
-        this.postStatus = status;
+        this.status = status;
     }
 
 
     public void update(PostRequestDto requestDto) {
-        this.postStatus = requestDto.getPostStatus();
+        this.status = requestDto.getStatus();
         this.content = requestDto.getContent();
         this.title = requestDto.getTitle();
         this.category = requestDto.getCategory();
-        this.likeCount = requestDto.getLikeCount();
+        this.like = requestDto.getLike();
     }
 }
