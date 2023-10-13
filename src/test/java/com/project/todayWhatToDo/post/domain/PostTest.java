@@ -28,7 +28,7 @@ public class PostTest {
         assertThat(post.getLike()).isEqualTo(20);
         assertThat(post.getContent()).isEqualTo("내용");
         assertThat(post.getAuthor()).isEqualTo("작성자");
-        assertThat(post.getCategory()).isEqualTo(PostStatus.ACTIVE);
+        assertThat(post.getCategory()).isEqualTo(PostStatus.ACTIVE.toString());
         assertThat(post.getTitle()).isEqualTo("제목");
 
     }
