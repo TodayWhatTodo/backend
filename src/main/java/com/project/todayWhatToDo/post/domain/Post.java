@@ -66,12 +66,12 @@ public class Post extends BaseTimeEntity {
         this.status = status;
     }
 
-
     public void update(PostRequestDto requestDto) {
         if(requestDto.getStatus() != null) this.status = requestDto.getStatus();
         if(requestDto.getContent() != null) this.content = requestDto.getContent();
         if(requestDto.getTitle() != null) this.title = requestDto.getTitle();
         if(requestDto.getCategory() != null) this.category = requestDto.getCategory();
         if(requestDto.getLike() != null) this.like = requestDto.getLike();
+
     }
 }
