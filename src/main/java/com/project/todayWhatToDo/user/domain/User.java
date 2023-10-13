@@ -65,6 +65,7 @@ public class User {
     @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follow> followings = new ArrayList<>();
 
+
     @Builder
     private User(String email, String nickname, String password, String name, Authority authority, Job job, String imagePath, String introduction, Boolean isAcceptAlarm) {
         this.email = email;

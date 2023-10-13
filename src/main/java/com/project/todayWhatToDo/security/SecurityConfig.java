@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
@@ -23,13 +24,14 @@ public class SecurityConfig {
         log.info("security config run");
         return http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(antMatcher("/v1/user/login")).permitAll()
-                        .requestMatchers(antMatcher("/**")).permitAll()
-                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                                .requestMatchers(antMatcher("/v1/user/login"), antMatcher("/h2-console/**")).permitAll()
+                                .requestMatchers(antMatcher("/**")).permitAll()
+                                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
 //                        .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers.frameOptions(FrameOptionsConfig::disable))
                 .build();
     }
 }
