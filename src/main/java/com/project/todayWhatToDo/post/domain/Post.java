@@ -46,10 +46,6 @@ public class Post extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
-    public void addLikePost (LikePost likePost) {
-        this.likePosts.add(likePost);
-        likePost.setPost(this);
-    }
 
     public void addLikePost(User user) {
         this.likePosts.add(LikePost.builder()
