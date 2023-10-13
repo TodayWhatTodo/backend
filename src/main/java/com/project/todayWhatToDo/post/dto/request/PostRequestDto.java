@@ -21,8 +21,7 @@ public class PostRequestDto {
     private String content;
     private String category;
     private Integer like;
-    // 좋아요 누른 사람 정보
-    private User user;
+    private User likedBy;
 
 
     public Post toEntity() {
