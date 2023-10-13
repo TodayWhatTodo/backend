@@ -277,7 +277,7 @@ public class UserServiceTest extends IntegrationTest {
                 .willReturn(loginProvider);
 
         var handler = mock(LoginResponseHandler.class);
-        given(loginProvider.getUserInfo(any()))
+        given(loginProvider.getUserInfo(any(), any()))
                 .willReturn(handler);
 
         given(handler.getEmail()).willReturn(email);

@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import static com.project.todayWhatToDo.security.Authority.COMMON;
 
@@ -24,6 +25,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final LoginApiManager loginManager;
+    private final RestTemplate restTemplate;
 
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
@@ -52,7 +54,7 @@ public class UserService implements UserDetailsService {
 
     private LoginResponseHandler getUserInfo(String provider, String token) {
         return loginManager.getProvider(provider)
-                .getUserInfo(token);
+                .getUserInfo(restTemplate, token);
     }
 
     public UserSession joinUser(CreateUserRequestDto request) {
