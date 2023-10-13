@@ -20,7 +20,6 @@ public class PostTest {
                 .category("개발")
                 .status(PostStatus.ACTIVE)
                 .title("제목")
-                .title("제목")
                 .build();
 
         // when then
@@ -28,9 +27,8 @@ public class PostTest {
         assertThat(post.getLike()).isEqualTo(20);
         assertThat(post.getContent()).isEqualTo("내용");
         assertThat(post.getAuthor()).isEqualTo("작성자");
-        assertThat(post.getCategory()).isEqualTo(PostStatus.ACTIVE.toString());
-        assertThat(post.getTitle()).isEqualTo("제목");
-
+        assertThat(post.getCategory()).isEqualTo("개발");
+        assertThat(post.getStatus()).isEqualTo(PostStatus.ACTIVE);
     }
     @Test
     @DisplayName("게시물 작성 테스트")
