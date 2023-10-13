@@ -46,6 +46,11 @@ public class Post extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
+    public void addLikePost (LikePost likePost) {
+        this.likePosts.add(likePost);
+        likePost.setPost(this);
+    }
+
     public void addLikePost(User user) {
         this.likePosts.add(LikePost.builder()
                 .user(user)
@@ -55,7 +60,8 @@ public class Post extends BaseTimeEntity {
 
 
     @Builder
-    public Post(String author, String title, Integer like, String category, String content, PostStatus status) {
+    public Post(User user, String author, String title, Integer like, String category, String content, PostStatus status) {
+        this.user = user;
         this.author = author;
         this.title = title;
         this.like = like;
@@ -66,10 +72,10 @@ public class Post extends BaseTimeEntity {
 
 
     public void update(PostRequestDto requestDto) {
-        this.status = requestDto.getStatus();
-        this.content = requestDto.getContent();
-        this.title = requestDto.getTitle();
-        this.category = requestDto.getCategory();
-        this.like = requestDto.getLike();
+        if(requestDto.getStatus() != null) this.status = requestDto.getStatus();
+        if(requestDto.getContent() != null) this.content = requestDto.getContent();
+        if(requestDto.getTitle() != null) this.title = requestDto.getTitle();
+        if(requestDto.getCategory() != null) this.category = requestDto.getCategory();
+        if(requestDto.getLike() != null) this.like = requestDto.getLike();
     }
 }

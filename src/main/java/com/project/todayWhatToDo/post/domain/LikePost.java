@@ -24,13 +24,17 @@ public class LikePost extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public void setPost(Post post) {
-        this.post = post;
-    }
 
     @Builder
     public LikePost(User user, Post post) {
         this.user = user;
         this.post = post;
+    }
+
+    public static LikePost of(User user, Post post) {
+        return LikePost.builder()
+                .post(post)
+                .user(user)
+                .build();
     }
 }

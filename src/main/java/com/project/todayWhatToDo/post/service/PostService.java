@@ -27,4 +27,5 @@ public class PostService {
     public void delete(PostRequestDto requestDto) {
         postRepository.deleteById(requestDto.getId());
     }
+
 }
