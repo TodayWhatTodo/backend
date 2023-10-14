@@ -1,8 +1,8 @@
 package com.project.todayWhatToDo.post.service;
 
-import com.project.todayWhatToDo.post.domain.LikePost;
+import com.project.todayWhatToDo.post.domain.Like;
 import com.project.todayWhatToDo.post.domain.Post;
-import com.project.todayWhatToDo.post.dto.request.PostRequestDto;
+import com.project.todayWhatToDo.post.dto.request.PostLikeRequestDto;
 import com.project.todayWhatToDo.post.exception.PostNotFoundException;
 import com.project.todayWhatToDo.post.repository.PostLikeRepository;
 import com.project.todayWhatToDo.post.repository.PostRepository;
@@ -24,15 +24,16 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final UserRepository userRepository;
 
-    public void likePost(PostRequestDto requestDto) {
-        Post post = postRepository.findById(requestDto.getId()).orElseThrow(PostNotFoundException::new);
-        User user = userRepository.findById(requestDto.getLikedBy()).orElseThrow(UserNotFoundException::new);
-        Optional<LikePost> likePost = postLikeRepository.findByPostIdAndUserId(post.getId(), user.getId());
+    public void likePost(PostLikeRequestDto requestDto) {
+        Post post = postRepository.findById(requestDto.postId()).orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(requestDto.userId()).orElseThrow(UserNotFoundException::new);
+        Optional<Like> likePost = postLikeRepository.findByPostIdAndUserId(post.getId(), user.getId());
 
         if (likePost.isPresent()) {
+            post.decreaseLike();
             postLikeRepository.delete(likePost.get());
         } else {
-            postLikeRepository.save(LikePost.of(user, post));
+            post.addLike(user);
         }
     }
 }

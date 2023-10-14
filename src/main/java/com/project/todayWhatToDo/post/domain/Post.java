@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @Entity
@@ -16,10 +19,6 @@ public class Post extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @Column(length = 50, nullable = false)
     private String title;
@@ -39,6 +38,19 @@ public class Post extends BaseTimeEntity {
     @Column
     @Enumerated(EnumType.STRING)
     private PostStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likeList = new ArrayList<>();
+
+
+    public void addLike(User user) {
+        like++;
+        likeList.add(Like.of(user, this));
+    }
 
     public void increaseLike() {
         like++;

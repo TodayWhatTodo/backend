@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Entity
-public class PostLike extends BaseTimeEntity {
+public class Like extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,13 +26,13 @@ public class PostLike extends BaseTimeEntity {
 
 
     @Builder
-    public PostLike(User user, Post post) {
+    public Like(User user, Post post) {
         this.user = user;
         this.post = post;
     }
 
-    public static PostLike of(User user, Post post) {
-        return PostLike.builder()
+    public static Like of(User user, Post post) {
+        return Like.builder()
                 .post(post)
                 .user(user)
                 .build();
