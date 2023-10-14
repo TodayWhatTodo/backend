@@ -67,7 +67,7 @@ public class PostLikeServiceTest extends IntegrationTest {
 
         @DisplayName("게시물 좋아요 누르면 좋아요가 1이된다.")
         @Test
-        public void likePost() {
+        public void increaseLike() {
             // given
             var requestDto = PostLikeRequestDto.builder()
                     .userId(user.getId())
@@ -82,7 +82,7 @@ public class PostLikeServiceTest extends IntegrationTest {
 
         @DisplayName("게시물 좋아요 취소시 -1이 된다.")
         @Test
-        public void dislikePost() {
+        public void decreaseLike() {
             // given
 
             // when
