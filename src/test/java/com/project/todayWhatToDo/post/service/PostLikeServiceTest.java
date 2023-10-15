@@ -1,10 +1,12 @@
 package com.project.todayWhatToDo.post.service;
 
 import com.project.todayWhatToDo.IntegrationTest;
+import com.project.todayWhatToDo.post.domain.Like;
 import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;
 import com.project.todayWhatToDo.post.dto.request.PostLikeRequestDto;
 import com.project.todayWhatToDo.post.exception.PostNotFoundException;
+import com.project.todayWhatToDo.post.repository.PostLikeRepository;
 import com.project.todayWhatToDo.post.repository.PostRepository;
 import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
@@ -31,6 +33,9 @@ public class PostLikeServiceTest extends IntegrationTest {
     PostRepository postRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    PostLikeRepository likeRepository;
+
 
     @DisplayName("게시물 좋아요 테스트")
     @Nested
@@ -84,10 +89,33 @@ public class PostLikeServiceTest extends IntegrationTest {
         @Test
         public void decreaseLike() {
             // given
+            Like like = likeRepository.saveAndFlush(Like.of(user, post));
 
-            // when
-
+            var requestDto = PostLikeRequestDto.builder()
+                    .userId(user.getId())
+                    .postId(post.getId())
+                    .build();
             // then
+            postLikeService.likePost(requestDto);
+            // then
+            assertThat(post.getLike()).isEqualTo(-1);
+        }
+
+        @DisplayName("이미 좋아요 누른 게시글 다시 좋아요 누르면 0이 된다.")
+        @Test
+        public void double_click_like_button () {
+            // given
+            var requestDto = PostLikeRequestDto.builder()
+                    .userId(user.getId())
+                    .postId(post.getId())
+                    .build();
+
+            postLikeService.likePost(requestDto);
+            // when
+            postLikeService.likePost(requestDto);
+            Post foundPost = postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
+            // then
+            assertThat(foundPost.getLike()).isZero();
         }
 
 
