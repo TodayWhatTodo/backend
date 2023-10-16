@@ -1,8 +1,9 @@
 package com.project.todayWhatToDo.user.login.handler;
 
 import com.project.todayWhatToDo.user.exception.LoginApiException;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
@@ -27,6 +28,18 @@ public class KakaoLoginRequestHandler implements LoginRequestHandler {
     private String getBearerToken(String token) {
         if (token.startsWith("Bearer")) return token;
         else return "Bearer" + token;
+    }
+
+    public void test1() {
+        RestTemplate template = new RestTemplate();
+
+        var requestEntity = RequestEntity.post("https://test.com")
+                .header("Authorization", "token")
+                .accept(MediaType.APPLICATION_FORM_URLENCODED)
+                .acceptCharset(StandardCharsets.UTF_8)
+                .body("{ \"data\":\"hello\"}");
+
+        var response = template.exchange(requestEntity, String.class);
     }
 
 }
