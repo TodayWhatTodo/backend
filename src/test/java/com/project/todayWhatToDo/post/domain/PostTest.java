@@ -35,7 +35,7 @@ public class PostTest {
         // given
         var post = Post.builder().build();
         //when //then
-        assertThat(post.getLike()).isZero();
+        assertThat(post.getLikeCount()).isZero();
     }
 
 

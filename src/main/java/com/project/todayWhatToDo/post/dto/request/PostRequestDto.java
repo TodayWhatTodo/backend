@@ -13,7 +13,7 @@ public record PostRequestDto (
         PostStatus status,
         String content,
         String category,
-        Integer like
+        Integer likeCount
 ) {
 
     public Post toEntity() {

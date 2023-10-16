@@ -19,13 +19,13 @@ public class PostService {
     }
 
     public void update(PostRequestDto requestDto) {
-        postRepository.findById(requestDto.getId())
+        postRepository.findById(requestDto.id())
                 .orElseThrow(PostNotFoundException::new)
                 .update(requestDto);
     }
 
     public void delete(PostRequestDto requestDto) {
-        postRepository.deleteById(requestDto.getId());
+        postRepository.deleteById(requestDto.id());
     }
 
 }

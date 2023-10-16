@@ -27,7 +27,7 @@ public class Post extends BaseTimeEntity {
     private String author;
 
     @Column
-    private Integer like = 0;
+    private Integer likeCount = 0;
 
     @Column(length = 20)
     private String category;
@@ -48,16 +48,16 @@ public class Post extends BaseTimeEntity {
 
 
     public void addLike(User user) {
-        like++;
+        likeCount++;
         likeList.add(Like.of(user, this));
     }
 
     public void increaseLike() {
-        like++;
+        likeCount++;
     }
 
     public void decreaseLike() {
-        like--;
+        likeCount--;
     }
 
     @Builder
@@ -65,18 +65,18 @@ public class Post extends BaseTimeEntity {
         this.user = user;
         this.author = author;
         this.title = title;
-        this.like = 0;
+        this.likeCount = 0;
         this.category = category;
         this.content = content;
         this.status = status;
     }
 
     public void update(PostRequestDto requestDto) {
-        if(requestDto.getStatus() != null) this.status = requestDto.getStatus();
-        if(requestDto.getContent() != null) this.content = requestDto.getContent();
-        if(requestDto.getTitle() != null) this.title = requestDto.getTitle();
-        if(requestDto.getCategory() != null) this.category = requestDto.getCategory();
-        if(requestDto.getLike() != null) this.like = requestDto.getLike();
+        if(requestDto.status() != null) this.status = requestDto.status();
+        if(requestDto.content() != null) this.content = requestDto.content();
+        if(requestDto.title() != null) this.title = requestDto.title();
+        if(requestDto.category() != null) this.category = requestDto.category();
+        if(requestDto.likeCount() != null) this.likeCount = requestDto.likeCount();
 
     }
 }

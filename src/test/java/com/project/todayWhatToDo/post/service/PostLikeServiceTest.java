@@ -82,7 +82,7 @@ public class PostLikeServiceTest extends IntegrationTest {
             postLikeService.likePost(requestDto);
             // then
             Post found = postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
-            assertThat(found.getLike()).isOne();
+            assertThat(found.getLikeCount()).isOne();
         }
 
         @DisplayName("게시물 좋아요 취소시 -1이 된다.")
@@ -98,7 +98,7 @@ public class PostLikeServiceTest extends IntegrationTest {
             // then
             postLikeService.likePost(requestDto);
             // then
-            assertThat(post.getLike()).isEqualTo(-1);
+            assertThat(post.getLikeCount()).isEqualTo(-1);
         }
 
         @DisplayName("이미 좋아요 누른 게시글 다시 좋아요 누르면 0이 된다.")
@@ -115,7 +115,7 @@ public class PostLikeServiceTest extends IntegrationTest {
             postLikeService.likePost(requestDto);
             Post foundPost = postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
             // then
-            assertThat(foundPost.getLike()).isZero();
+            assertThat(foundPost.getLikeCount()).isZero();
         }
 
 
