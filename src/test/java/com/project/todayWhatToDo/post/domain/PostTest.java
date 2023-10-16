@@ -16,7 +16,6 @@ public class PostTest {
         var post = Post.builder()
                 .author("작성자")
                 .content("내용")
-                .like(20)
                 .category("개발")
                 .status(PostStatus.ACTIVE)
                 .title("제목")
@@ -24,12 +23,19 @@ public class PostTest {
 
         // when then
         assertThat(post.getTitle()).isEqualTo("제목");
-        assertThat(post.getLike()).isEqualTo(20);
         assertThat(post.getContent()).isEqualTo("내용");
         assertThat(post.getAuthor()).isEqualTo("작성자");
         assertThat(post.getStatus()).isEqualTo(PostStatus.ACTIVE);
         assertThat(post.getCategory()).isEqualTo("개발");
+    }
 
+    @DisplayName("게시물 좋아요 초기값은 0이다.")
+    @Test
+    public void defaultLikeCount() {
+        // given
+        var post = Post.builder().build();
+        //when //then
+        assertThat(post.getLike()).isZero();
     }
 
 

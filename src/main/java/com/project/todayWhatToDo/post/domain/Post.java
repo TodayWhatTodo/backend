@@ -20,13 +20,6 @@ public class Post extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @OneToMany(mappedBy = "post")
-    private List<LikePost> likePosts = new ArrayList<>();
-
     @Column(length = 50, nullable = false)
     private String title;
 
@@ -34,7 +27,7 @@ public class Post extends BaseTimeEntity {
     private String author;
 
     @Column
-    private Integer like;
+    private Integer like = 0;
 
     @Column(length = 20)
     private String category;
@@ -46,21 +39,33 @@ public class Post extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public void addLikePost(User user) {
-        this.likePosts.add(LikePost.builder()
-                .user(user)
-                .post(this)
-                .build());
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likeList = new ArrayList<>();
+
+
+    public void addLike(User user) {
+        like++;
+        likeList.add(Like.of(user, this));
     }
 
+    public void increaseLike() {
+        like++;
+    }
+
+    public void decreaseLike() {
+        like--;
+    }
 
     @Builder
-    public Post(User user, String author, String title, Integer like, String category, String content, PostStatus status) {
+    public Post(User user, String author, String title, String category, String content, PostStatus status) {
         this.user = user;
         this.author = author;
         this.title = title;
-        this.like = like;
+        this.like = 0;
         this.category = category;
         this.content = content;
         this.status = status;

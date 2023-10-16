@@ -2,27 +2,19 @@ package com.project.todayWhatToDo.post.dto.request;
 
 import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;
-import com.project.todayWhatToDo.user.domain.User;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
+
 @Builder
-@Getter
-public class PostRequestDto {
-
-    private Long id;
-    private String author;
-    private String title;
-    private PostStatus status;
-    private String content;
-    private String category;
-    private Integer like;
-    private User likedBy;
-
+public record PostRequestDto (
+        Long id,
+        String author,
+        String title,
+        PostStatus status,
+        String content,
+        String category,
+        Integer like
+) {
 
     public Post toEntity() {
         return Post.builder()
@@ -31,7 +23,6 @@ public class PostRequestDto {
                 .status(status)
                 .content(content)
                 .category(category)
-                .like(like)
                 .build();
     }
 
