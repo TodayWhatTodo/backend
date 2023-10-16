@@ -8,7 +8,7 @@ import java.util.Map;
 
 public abstract class LoginResponseHandler {
     @Getter
-    private Map<String, Object> response;
+    private final Map<String, Object> response;
 
     public LoginResponseHandler(String response) {
         try {
@@ -18,7 +18,6 @@ public abstract class LoginResponseHandler {
             throw new IllegalArgumentException("로그인 API 응답 결과가 올바르지 않습니다");
         }
     }
-
 
     public abstract String getEmail();
 
