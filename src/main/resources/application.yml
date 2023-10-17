@@ -26,3 +26,7 @@ springdoc:
     path: /swagger-ui/api-docs
   swarger-ui:
     path: /swagger-ui/docs
+
+
+file:
+  path: /Users/swc/Downloads/study/side-project/etc/file/
