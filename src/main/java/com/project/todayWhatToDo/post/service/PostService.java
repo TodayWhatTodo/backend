@@ -1,6 +1,6 @@
 package com.project.todayWhatToDo.post.service;
 
-import com.project.todayWhatToDo.post.dto.request.PostRequestDto;
+import com.project.todayWhatToDo.post.dto.PostRequestDto;
 import com.project.todayWhatToDo.post.exception.PostNotFoundException;
 import com.project.todayWhatToDo.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;

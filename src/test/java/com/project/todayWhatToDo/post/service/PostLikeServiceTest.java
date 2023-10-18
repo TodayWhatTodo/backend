@@ -4,7 +4,7 @@ import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.post.domain.Like;
 import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;
-import com.project.todayWhatToDo.post.dto.request.PostLikeRequestDto;
+import com.project.todayWhatToDo.post.dto.PostLikeRequestDto;
 import com.project.todayWhatToDo.post.exception.PostNotFoundException;
 import com.project.todayWhatToDo.post.repository.PostLikeRepository;
 import com.project.todayWhatToDo.post.repository.PostRepository;

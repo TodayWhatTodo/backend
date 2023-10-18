@@ -1,4 +1,4 @@
-package com.project.todayWhatToDo.post.dto.request;
+package com.project.todayWhatToDo.post.dto;
 
 import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;

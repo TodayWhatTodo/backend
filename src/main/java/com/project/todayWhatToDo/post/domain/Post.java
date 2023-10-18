@@ -1,7 +1,7 @@
 package com.project.todayWhatToDo.post.domain;
 
 import com.project.todayWhatToDo.BaseTimeEntity;
-import com.project.todayWhatToDo.post.dto.request.PostRequestDto;
+import com.project.todayWhatToDo.post.dto.PostRequestDto;
 import com.project.todayWhatToDo.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
