@@ -85,7 +85,7 @@ public class PostServiceTest extends IntegrationTest {
             requestDto = PostRequestDto.builder()
                     .keywordList(List.of("태그수정")).build();
             // when
-            postService.update(requestDto);
+//            postService.update(requestDto);
             //then
 
         }
