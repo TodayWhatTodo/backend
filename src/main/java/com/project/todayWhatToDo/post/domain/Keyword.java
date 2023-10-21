@@ -24,14 +24,13 @@ public class Keyword extends BaseTimeEntity {
         this.keyword = keyword;
     }
 
-    public KeywordDto toDto() {
-        return KeywordDto.builder()
+    public static Keyword from(String keyword) {
+        return Keyword.builder()
                 .keyword(keyword)
                 .build();
     }
 
     public void update(KeywordDto requestDto) {
         if(requestDto.keyword() != null) this.keyword = requestDto.keyword();
-
     }
 }

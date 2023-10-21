@@ -7,9 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
-@Entity
+
 @Getter
 @NoArgsConstructor
+@Entity
 public class KeywordInfo extends BaseTimeEntity {
 
     @Id
@@ -30,10 +31,11 @@ public class KeywordInfo extends BaseTimeEntity {
         this.keyword = keyword;
     }
 
-    public static KeywordInfo of(Keyword keyword, Post post) {
+    public static KeywordInfo of(Post post, Keyword keyword) {
         return KeywordInfo.builder()
                 .post(post)
                 .keyword(keyword)
                 .build();
     }
 }
+

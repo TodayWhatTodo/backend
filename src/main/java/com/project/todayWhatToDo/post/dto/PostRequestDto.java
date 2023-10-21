@@ -4,6 +4,8 @@ import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;
 import lombok.Builder;
 
+import java.util.List;
+
 
 @Builder
 public record PostRequestDto (
@@ -13,7 +15,8 @@ public record PostRequestDto (
         PostStatus status,
         String content,
         String category,
-        Integer likeCount
+        Integer likeCount,
+        List<String> keywordList
 ) {
 
     public Post toEntity() {

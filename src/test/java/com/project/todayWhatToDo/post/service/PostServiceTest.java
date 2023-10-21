@@ -1,11 +1,11 @@
 package com.project.todayWhatToDo.post.service;
 
 import com.project.todayWhatToDo.IntegrationTest;
+import com.project.todayWhatToDo.post.domain.KeywordInfo;
 import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;
+import com.project.todayWhatToDo.post.dto.PostRequestDto;
 import com.project.todayWhatToDo.post.repository.PostRepository;
-import com.project.todayWhatToDo.user.domain.Job;
-import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,65 +14,79 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.project.todayWhatToDo.security.Authority.COMMON;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 public class PostServiceTest extends IntegrationTest {
 
     @Autowired
     PostService postService;
+    @Autowired
+    KeywordInfoService keywordInfoService;
 
     @Autowired
     PostRepository postRepository;
     @Autowired
     UserRepository userRepository;
 
-
-
     @DisplayName("게시물 CRUD 테스트")
     @Nested
     class postLikeTest {
 
-        Post post;
-        User user;
+        PostRequestDto requestDto;
 
         @BeforeEach
         void init() {
-            user = userRepository.saveAndFlush(User.builder()
-                    .email("user1@naver.com")
-                    .nickname("user1")
-                    .introduction("today is fun")
-                    .password("qwerqwer2@")
-                    .name("홍길동")
-                    .authority(COMMON)
-                    .job(Job.builder()
-                            .companyName("test company")
-                            .address("test address")
-                            .position("신입")
-                            .build())
-                    .build());
-
-            post = postRepository.saveAndFlush(Post.builder()
-                    .title("게시글 제목")
-                    .content("게시글 내용")
+             requestDto = PostRequestDto.builder()
+                    .author("작성자")
+                    .title("제목")
                     .status(PostStatus.ACTIVE)
                     .category("개발")
-                    .author("작성자")
-                    .build());
+                    .content("내용")
+                    .keywordList(Arrays.asList("태그33", "태그2"))
+                    .build();
         }
 
+        @DisplayName("게시물 등록.")
+        @Nested
+        class savePost {
 
-        @DisplayName("게시물이 등록된다.")
-        @Test
-        public void savePost() {
-            // given
+            @DisplayName("게시물이 저장된다.")
+            @Test
+            void save_post() {
+                // given
+                // when
+                Long savedId = postService.save(requestDto);
+                // then
+                Post findPost = postService.findById(savedId);
+                assertThat(savedId).isEqualTo(findPost.getId());
+            }
 
+            @DisplayName("키워드가 저장된다.")
+            @Test
+            void save_keyword() {
+                // given
+                // when
+                Long savedId = postService.save(requestDto);
+                List<KeywordInfo> keywordInfoList = keywordInfoService.findByPostId(savedId);
+                // then
+                List<String> keywordList = keywordInfoList.stream().map(keywordInfo -> keywordInfo.getKeyword().getKeyword()).toList();
+                assertThat(keywordList).isEqualTo(requestDto.keywordList());
+            }
         }
 
         @DisplayName("게시물이 수정된다.")
         @Test
         public void updatePost() {
             // given
+            requestDto = PostRequestDto.builder()
+                    .keywordList(List.of("태그수정")).build();
+            // when
+            postService.update(requestDto);
+            //then
 
         }
 

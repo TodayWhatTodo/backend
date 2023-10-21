@@ -37,7 +37,7 @@ public class Post extends BaseTimeEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private PostStatus status;
+    private PostStatus status = PostStatus.ACTIVE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -46,6 +46,8 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likeList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post")
+    private List<KeywordInfo> keywordInfos = new ArrayList<>();
 
     public void addLike(User user) {
         likeCount++;
@@ -65,7 +67,6 @@ public class Post extends BaseTimeEntity {
         this.user = user;
         this.author = author;
         this.title = title;
-        this.likeCount = 0;
         this.category = category;
         this.content = content;
         this.status = status;
