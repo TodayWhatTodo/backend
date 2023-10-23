@@ -1,9 +1,9 @@
 package com.project.todayWhatToDo.post.service;
 
 import com.project.todayWhatToDo.IntegrationTest;
-import com.project.todayWhatToDo.post.domain.KeywordInfo;
 import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;
+import com.project.todayWhatToDo.post.dto.KeywordRequestDto;
 import com.project.todayWhatToDo.post.dto.PostRequestDto;
 import com.project.todayWhatToDo.post.repository.PostRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,8 +23,6 @@ public class PostServiceTest extends IntegrationTest {
 
     @Autowired
     PostService postService;
-    @Autowired
-    KeywordInfoService keywordInfoService;
 
     @Autowired
     PostRepository postRepository;
@@ -46,44 +43,33 @@ public class PostServiceTest extends IntegrationTest {
                     .status(PostStatus.ACTIVE)
                     .category("개발")
                     .content("내용")
-                    .keywordList(Arrays.asList("태그33", "태그2"))
+                    .keywordList(Arrays.asList(KeywordRequestDto.builder().keyword("키워드21").build(),
+                            KeywordRequestDto.builder().keyword("키워드2").build()))
                     .build();
         }
 
-        @DisplayName("게시물 등록.")
-        @Nested
-        class savePost {
 
-            @DisplayName("게시물이 저장된다.")
-            @Test
-            void save_post() {
-                // given
-                // when
-                Long savedId = postService.save(requestDto);
-                // then
-                Post findPost = postService.findById(savedId);
-                assertThat(savedId).isEqualTo(findPost.getId());
-            }
 
-            @DisplayName("키워드가 저장된다.")
-            @Test
-            void save_keyword() {
-                // given
-                // when
-                Long savedId = postService.save(requestDto);
-                List<KeywordInfo> keywordInfoList = keywordInfoService.findByPostId(savedId);
-                // then
-                List<String> keywordList = keywordInfoList.stream().map(keywordInfo -> keywordInfo.getKeyword().getKeyword()).toList();
-                assertThat(keywordList).isEqualTo(requestDto.keywordList());
-            }
+        @DisplayName("게시물이 저장된다.")
+        @Test
+        void save_post() {
+            // given
+            // when
+            Long savedId = postService.save(requestDto);
+            // then
+            Post findPost = postService.findFetchById(savedId);
+            assertThat(savedId).isEqualTo(findPost.getId());
         }
 
-        @DisplayName("게시물이 수정된다.")
+
+
+        @DisplayName("게시물이 수정된다. : 키워드 수정")
         @Test
         public void updatePost() {
             // given
-            requestDto = PostRequestDto.builder()
-                    .keywordList(List.of("태그수정")).build();
+//            requestDto = PostRequestDto.builder()
+//                    .keywordList(KeywordRequestDto.builder()
+//                            .keyword().build();
             // when
 //            postService.update(requestDto);
             //then

@@ -16,7 +16,7 @@ public record PostRequestDto (
         String content,
         String category,
         Integer likeCount,
-        List<String> keywordList
+        List<KeywordRequestDto> keywordList
 ) {
 
     public Post toEntity() {

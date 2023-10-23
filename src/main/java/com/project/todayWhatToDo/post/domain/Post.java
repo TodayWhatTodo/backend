@@ -46,8 +46,13 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likeList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post")
-    private List<KeywordInfo> keywordInfos = new ArrayList<>();
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Keyword> keywords = new ArrayList<>();
+
+    public void addKeyword(Keyword keyword) {
+        keywords.add(keyword);
+        keyword.setPost(this);
+    }
 
     public void addLike(User user) {
         likeCount++;
@@ -78,6 +83,5 @@ public class Post extends BaseTimeEntity {
         if(requestDto.title() != null) this.title = requestDto.title();
         if(requestDto.category() != null) this.category = requestDto.category();
         if(requestDto.likeCount() != null) this.likeCount = requestDto.likeCount();
-
     }
 }
