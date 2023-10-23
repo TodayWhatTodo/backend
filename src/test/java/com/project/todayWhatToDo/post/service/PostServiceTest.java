@@ -7,18 +7,14 @@ import com.project.todayWhatToDo.post.dto.KeywordRequestDto;
 import com.project.todayWhatToDo.post.dto.PostRequestDto;
 import com.project.todayWhatToDo.post.repository.PostRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Transactional
+//@Transactional
 public class PostServiceTest extends IntegrationTest {
 
     @Autowired
@@ -31,7 +27,7 @@ public class PostServiceTest extends IntegrationTest {
 
     @DisplayName("게시물 CRUD 테스트")
     @Nested
-    class postLikeTest {
+    class postTest {
 
         PostRequestDto requestDto;
 
@@ -48,6 +44,10 @@ public class PostServiceTest extends IntegrationTest {
                     .build();
         }
 
+        @AfterEach
+        void tearDown() {
+            postRepository.deleteAll();
+        }
 
 
         @DisplayName("게시물이 저장된다.")

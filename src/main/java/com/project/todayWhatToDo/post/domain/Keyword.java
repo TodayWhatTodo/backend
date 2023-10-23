@@ -33,7 +33,7 @@ public class Keyword extends BaseTimeEntity {
 
     public static Keyword from(KeywordRequestDto requestDto) {
         return Keyword.builder()
-                .keyword(requestDto.keyword())
+                .keyword(requestDto.after().isBlank() ? requestDto.keyword() : requestDto.after())
                 .build();
     }
 
