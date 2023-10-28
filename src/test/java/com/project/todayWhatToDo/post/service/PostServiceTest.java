@@ -8,14 +8,18 @@ import com.project.todayWhatToDo.post.dto.UpdatePostRequestDto;
 import com.project.todayWhatToDo.post.repository.KeywordRepository;
 import com.project.todayWhatToDo.post.repository.PostRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-//@Transactional
+@Transactional
 public class PostServiceTest extends IntegrationTest {
 
     @Autowired
@@ -46,10 +50,10 @@ public class PostServiceTest extends IntegrationTest {
                     .build();
         }
 
-        @AfterEach
-        void tearDown() {
-//            postRepository.deleteAll();
-        }
+//        @AfterEach
+//        void tearDown() {
+////            postRepository.deleteAll();
+//        }
 
 
         @DisplayName("게시물이 저장된다. 키워드도 저장된다.")
