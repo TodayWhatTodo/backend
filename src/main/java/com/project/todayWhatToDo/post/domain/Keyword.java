@@ -35,9 +35,5 @@ public class Keyword extends BaseTimeEntity {
             this.keyword = keyword;
         }
     }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
 }
 
