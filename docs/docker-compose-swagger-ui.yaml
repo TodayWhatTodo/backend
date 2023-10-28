@@ -1,0 +1,9 @@
+services:
+  swagger-server:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8000:8080"
+    volumes:
+      - "../build/api-spec/openapi3.yaml:/usr/share/nginx/html/openapi.yaml"
+    environment:
+      - URL=./openapi.yaml
