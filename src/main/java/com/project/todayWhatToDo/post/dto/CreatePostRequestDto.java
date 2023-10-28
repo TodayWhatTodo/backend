@@ -6,9 +6,8 @@ import lombok.Builder;
 
 import java.util.List;
 
-
 @Builder
-public record PostRequestDto (
+public record CreatePostRequestDto(
         Long id,
         String author,
         String title,
@@ -16,7 +15,7 @@ public record PostRequestDto (
         String content,
         String category,
         Integer likeCount,
-        List<KeywordRequestDto> keywordList
+        List<String> keywordList
 ) {
 
     public Post toEntity() {
@@ -26,6 +25,7 @@ public record PostRequestDto (
                 .status(status)
                 .content(content)
                 .category(category)
+                .keywords(keywordList)
                 .build();
     }
 

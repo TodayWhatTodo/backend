@@ -1,12 +1,12 @@
 package com.project.todayWhatToDo.post.service;
 
 import com.project.todayWhatToDo.IntegrationTest;
-import com.project.todayWhatToDo.post.domain.Like;
+import com.project.todayWhatToDo.post.domain.Heart;
 import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;
-import com.project.todayWhatToDo.post.dto.PostLikeRequestDto;
+import com.project.todayWhatToDo.post.dto.PostHeartRequestDto;
 import com.project.todayWhatToDo.post.exception.PostNotFoundException;
-import com.project.todayWhatToDo.post.repository.PostLikeRepository;
+import com.project.todayWhatToDo.post.repository.PostHeartRepository;
 import com.project.todayWhatToDo.post.repository.PostRepository;
 import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
@@ -18,28 +18,30 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 import static com.project.todayWhatToDo.security.Authority.COMMON;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
-public class PostLikeServiceTest extends IntegrationTest {
+public class PostHeartServiceTest extends IntegrationTest {
 
     @Autowired
     PostService postService;
     @Autowired
-    PostLikeService postLikeService;
+    PostHeartService postHeartService;
 
     @Autowired
     PostRepository postRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
-    PostLikeRepository likeRepository;
+    PostHeartRepository likeRepository;
 
 
     @DisplayName("게시물 좋아요 테스트")
     @Nested
-    class postLikeTest {
+    class postHeartTest {
 
         Post post;
         User user;
@@ -64,6 +66,7 @@ public class PostLikeServiceTest extends IntegrationTest {
                     .title("게시글 제목")
                     .content("게시글 내용")
                     .status(PostStatus.ACTIVE)
+                    .keywords(new ArrayList<>())
                     .category("개발")
                     .author("작성자")
                     .build());
@@ -74,12 +77,12 @@ public class PostLikeServiceTest extends IntegrationTest {
         @Test
         public void increaseLike() {
             // given
-            var requestDto = PostLikeRequestDto.builder()
+            var requestDto = PostHeartRequestDto.builder()
                     .userId(user.getId())
                     .postId(post.getId())
                     .build();
             // when
-            postLikeService.likePost(requestDto);
+            postHeartService.likePost(requestDto);
             // then
             Post found = postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
             assertThat(found.getLikeCount()).isOne();
@@ -89,14 +92,14 @@ public class PostLikeServiceTest extends IntegrationTest {
         @Test
         public void decreaseLike() {
             // given
-            Like like = likeRepository.saveAndFlush(Like.of(user, post));
+            Heart heart = likeRepository.saveAndFlush(Heart.of(user, post));
 
-            var requestDto = PostLikeRequestDto.builder()
+            var requestDto = PostHeartRequestDto.builder()
                     .userId(user.getId())
                     .postId(post.getId())
                     .build();
             // then
-            postLikeService.likePost(requestDto);
+            postHeartService.likePost(requestDto);
             // then
             assertThat(post.getLikeCount()).isEqualTo(-1);
         }
@@ -105,14 +108,14 @@ public class PostLikeServiceTest extends IntegrationTest {
         @Test
         public void double_click_like_button () {
             // given
-            var requestDto = PostLikeRequestDto.builder()
+            var requestDto = PostHeartRequestDto.builder()
                     .userId(user.getId())
                     .postId(post.getId())
                     .build();
 
-            postLikeService.likePost(requestDto);
+            postHeartService.likePost(requestDto);
             // when
-            postLikeService.likePost(requestDto);
+            postHeartService.likePost(requestDto);
             Post foundPost = postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
             // then
             assertThat(foundPost.getLikeCount()).isZero();

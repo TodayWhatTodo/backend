@@ -1,10 +1,10 @@
 package com.project.todayWhatToDo.post.service;
 
-import com.project.todayWhatToDo.post.domain.Like;
+import com.project.todayWhatToDo.post.domain.Heart;
 import com.project.todayWhatToDo.post.domain.Post;
-import com.project.todayWhatToDo.post.dto.PostLikeRequestDto;
+import com.project.todayWhatToDo.post.dto.PostHeartRequestDto;
 import com.project.todayWhatToDo.post.exception.PostNotFoundException;
-import com.project.todayWhatToDo.post.repository.PostLikeRepository;
+import com.project.todayWhatToDo.post.repository.PostHeartRepository;
 import com.project.todayWhatToDo.post.repository.PostRepository;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
@@ -18,20 +18,20 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 @Service
-public class PostLikeService {
+public class PostHeartService {
 
     private final PostRepository postRepository;
-    private final PostLikeRepository postLikeRepository;
+    private final PostHeartRepository postHeartRepository;
     private final UserRepository userRepository;
 
-    public void likePost(PostLikeRequestDto requestDto) {
+    public void likePost(PostHeartRequestDto requestDto) {
         Post post = postRepository.findById(requestDto.postId()).orElseThrow(PostNotFoundException::new);
         User user = userRepository.findById(requestDto.userId()).orElseThrow(UserNotFoundException::new);
-        Optional<Like> likePost = postLikeRepository.findByPostIdAndUserId(post.getId(), user.getId());
+        Optional<Heart> likePost = postHeartRepository.findByPostIdAndUserId(post.getId(), user.getId());
 
         if (likePost.isPresent()) {
             post.decreaseLike();
-            postLikeRepository.delete(likePost.get());
+            postHeartRepository.delete(likePost.get());
         } else {
             post.addLike(user);
         }

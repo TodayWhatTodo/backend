@@ -1,7 +1,7 @@
 package com.project.todayWhatToDo.post.domain;
 
 import com.project.todayWhatToDo.BaseTimeEntity;
-import com.project.todayWhatToDo.post.dto.PostRequestDto;
+import com.project.todayWhatToDo.post.dto.UpdatePostRequestDto;
 import com.project.todayWhatToDo.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Getter
 @NoArgsConstructor
@@ -44,19 +45,32 @@ public class Post extends BaseTimeEntity {
     private User user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likeList = new ArrayList<>();
+    private List<Heart> heartList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Keyword> keywords = new ArrayList<>();
 
-    public void addKeyword(Keyword keyword) {
-        keywords.add(keyword);
-        keyword.setPost(this);
+    @Builder
+    private Post(String title, String author, String category, String content, PostStatus status, User user, List<Heart> heartList, List<String> keywords) {
+        this.title = title;
+        this.author = author;
+        this.category = category;
+        this.content = content;
+        this.status = status;
+        keywords.forEach(this::addKeyword);
+    }
+
+    public void addKeyword(String name) {
+        keywords.add(Keyword.builder()
+                .post(this)
+                .keyword(name)
+                .build()
+        );
     }
 
     public void addLike(User user) {
         likeCount++;
-        likeList.add(Like.of(user, this));
+        heartList.add(Heart.of(user, this));
     }
 
     public void increaseLike() {
@@ -67,21 +81,20 @@ public class Post extends BaseTimeEntity {
         likeCount--;
     }
 
-    @Builder
-    public Post(User user, String author, String title, String category, String content, PostStatus status) {
-        this.user = user;
-        this.author = author;
-        this.title = title;
-        this.category = category;
-        this.content = content;
-        this.status = status;
+
+    public void update(UpdatePostRequestDto requestDto) {
+        if (requestDto.status() != null) this.status = requestDto.status();
+        if (requestDto.content() != null) this.content = requestDto.content();
+        if (requestDto.title() != null) this.title = requestDto.title();
+        if (requestDto.category() != null) this.category = requestDto.category();
+        if(!keywords.isEmpty()) {
+            keywords.clear();
+            requestDto.keywordList().forEach(this::addKeyword);
+        }
     }
 
-    public void update(PostRequestDto requestDto) {
-        if(requestDto.status() != null) this.status = requestDto.status();
-        if(requestDto.content() != null) this.content = requestDto.content();
-        if(requestDto.title() != null) this.title = requestDto.title();
-        if(requestDto.category() != null) this.category = requestDto.category();
-        if(requestDto.likeCount() != null) this.likeCount = requestDto.likeCount();
+    public void update() {
+
     }
+
 }

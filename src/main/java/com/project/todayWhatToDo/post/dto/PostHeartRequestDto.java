@@ -3,7 +3,7 @@ package com.project.todayWhatToDo.post.dto;
 import lombok.Builder;
 
 @Builder
-public record PostLikeRequestDto(
+public record PostHeartRequestDto(
         Long postId,
         Long userId
 ) {

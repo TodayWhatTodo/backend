@@ -1,25 +1,21 @@
 package com.project.todayWhatToDo.post.service;
 
 import com.project.todayWhatToDo.IntegrationTest;
-import com.project.todayWhatToDo.post.domain.Keyword;
 import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;
-import com.project.todayWhatToDo.post.dto.KeywordRequestDto;
-import com.project.todayWhatToDo.post.dto.PostRequestDto;
+import com.project.todayWhatToDo.post.dto.CreatePostRequestDto;
+import com.project.todayWhatToDo.post.dto.UpdatePostRequestDto;
 import com.project.todayWhatToDo.post.repository.KeywordRepository;
 import com.project.todayWhatToDo.post.repository.PostRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.stream.Stream;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Transactional
+//@Transactional
 public class PostServiceTest extends IntegrationTest {
 
     @Autowired
@@ -36,25 +32,24 @@ public class PostServiceTest extends IntegrationTest {
     @Nested
     class postTest {
 
-        PostRequestDto requestDto;
+        CreatePostRequestDto requestDto;
 
         @BeforeEach
         void init() {
-             requestDto = PostRequestDto.builder()
+             requestDto = CreatePostRequestDto.builder()
                     .author("작성자")
                     .title("제목")
                     .status(PostStatus.ACTIVE)
                     .category("개발")
                     .content("내용")
-                    .keywordList(Arrays.asList(KeywordRequestDto.builder().keyword("키워드21").build(),
-                            KeywordRequestDto.builder().keyword("키워드2").build()))
+                    .keywordList(List.of("키워드1", "키워드2"))
                     .build();
         }
 
-//        @AfterEach
-//        void tearDown() {
-////            postRepository.deleteAll();
-//        }
+        @AfterEach
+        void tearDown() {
+//            postRepository.deleteAll();
+        }
 
 
         @DisplayName("게시물이 저장된다. 키워드도 저장된다.")
@@ -76,21 +71,18 @@ public class PostServiceTest extends IntegrationTest {
             // given
             Long savedId = postService.save(requestDto);
             Post findPost = postService.findFetchById(savedId);
-            PostRequestDto request = PostRequestDto.builder()
-                    .id(findPost.getId())
-                    .title(findPost.getTitle())
-                    .content(findPost.getContent())
-                    .author(findPost.getAuthor())
-                    .keywordList(Collections.singletonList(KeywordRequestDto.builder()
-                            .keyword("키워드2").after("수정된 키워드").build()))
-                    .build();
-
+            UpdatePostRequestDto updateRequest = UpdatePostRequestDto.builder()
+                    .id(savedId)
+                    .content("수정된 내용")
+                    .keywordList(List.of("수정된 키워드1", "수정된 키워드2")).build();
             // when
-            Long updatedId = postService.update(request);
+            postService.update(updateRequest);
             //then
-            // 업데이트 된 키워드 확인
-            Stream<Keyword> keywordStream = keywordRepository.findByPostId(updatedId).stream();
-            assertThat(keywordStream.map(Keyword::getKeyword)).containsAnyOf("수정된 키워드");
+            Post updatedPost = postService.findFetchById(findPost.getId());
+            assertThat(updatedPost.getKeywords())
+                    .extracting("keyword")
+                    .contains("수정된 키워드1", "수정된 키워드2");
+            assertThat(updatedPost.getContent()).isEqualTo("수정된 내용");
 
         }
 
