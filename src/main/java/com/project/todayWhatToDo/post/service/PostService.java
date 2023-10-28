@@ -1,9 +1,9 @@
 package com.project.todayWhatToDo.post.service;
 
 import com.project.todayWhatToDo.post.domain.Post;
-import com.project.todayWhatToDo.post.dto.KeywordRequestDto;
-import com.project.todayWhatToDo.post.dto.PostRequestDto;
-import com.project.todayWhatToDo.post.exception.KeywordNotFoundException;
+import com.project.todayWhatToDo.post.dto.CreatePostRequestDto;
+import com.project.todayWhatToDo.post.dto.DeletePostRequestDto;
+import com.project.todayWhatToDo.post.dto.UpdatePostRequestDto;
 import com.project.todayWhatToDo.post.exception.PostNotFoundException;
 import com.project.todayWhatToDo.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
