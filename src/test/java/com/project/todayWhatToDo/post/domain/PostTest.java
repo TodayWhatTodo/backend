@@ -34,13 +34,13 @@ public class PostTest {
 
     @DisplayName("게시물 좋아요 초기값은 0이다.")
     @Test
-    public void defaultLikeCount() {
+    public void defaultheartCount() {
         // given
         var post = Post.builder()
                 .keywords(new ArrayList<>())
                 .build();
         //when //then
-        assertThat(post.getLikeCount()).isZero();
+        assertThat(post.getHeartCount()).isZero();
     }
 
 

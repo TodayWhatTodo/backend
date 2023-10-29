@@ -28,7 +28,7 @@ public class Post extends BaseTimeEntity {
     private String author;
 
     @Column
-    private Integer likeCount = 0;
+    private Integer heartCount = 0;
 
     @Column(length = 20)
     private String category;
@@ -69,16 +69,16 @@ public class Post extends BaseTimeEntity {
     }
 
     public void addLike(User user) {
-        likeCount++;
+        heartCount++;
         heartList.add(Heart.of(user, this));
     }
 
     public void increaseLike() {
-        likeCount++;
+        heartCount++;
     }
 
     public void decreaseLike() {
-        likeCount--;
+        heartCount--;
     }
 
 

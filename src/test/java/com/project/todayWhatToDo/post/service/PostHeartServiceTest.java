@@ -82,10 +82,10 @@ public class PostHeartServiceTest extends IntegrationTest {
                     .postId(post.getId())
                     .build();
             // when
-            postHeartService.likePost(requestDto);
+            postHeartService.heartPost(requestDto);
             // then
             Post found = postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
-            assertThat(found.getLikeCount()).isOne();
+            assertThat(found.getHeartCount()).isOne();
         }
 
         @DisplayName("게시물 좋아요 취소시 -1이 된다.")
@@ -99,9 +99,9 @@ public class PostHeartServiceTest extends IntegrationTest {
                     .postId(post.getId())
                     .build();
             // then
-            postHeartService.likePost(requestDto);
+            postHeartService.heartPost(requestDto);
             // then
-            assertThat(post.getLikeCount()).isEqualTo(-1);
+            assertThat(post.getHeartCount()).isEqualTo(-1);
         }
 
         @DisplayName("이미 좋아요 누른 게시글 다시 좋아요 누르면 0이 된다.")
@@ -113,12 +113,12 @@ public class PostHeartServiceTest extends IntegrationTest {
                     .postId(post.getId())
                     .build();
 
-            postHeartService.likePost(requestDto);
+            postHeartService.heartPost(requestDto);
             // when
-            postHeartService.likePost(requestDto);
+            postHeartService.heartPost(requestDto);
             Post foundPost = postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
             // then
-            assertThat(foundPost.getLikeCount()).isZero();
+            assertThat(foundPost.getHeartCount()).isZero();
         }
 
 

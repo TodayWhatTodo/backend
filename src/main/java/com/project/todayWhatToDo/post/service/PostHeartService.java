@@ -24,14 +24,14 @@ public class PostHeartService {
     private final PostHeartRepository postHeartRepository;
     private final UserRepository userRepository;
 
-    public void likePost(PostHeartRequestDto requestDto) {
+    public void heartPost(PostHeartRequestDto requestDto) {
         Post post = postRepository.findById(requestDto.postId()).orElseThrow(PostNotFoundException::new);
         User user = userRepository.findById(requestDto.userId()).orElseThrow(UserNotFoundException::new);
-        Optional<Heart> likePost = postHeartRepository.findByPostIdAndUserId(post.getId(), user.getId());
+        Optional<Heart> heartPost = postHeartRepository.findByPostIdAndUserId(post.getId(), user.getId());
 
-        if (likePost.isPresent()) {
+        if (heartPost.isPresent()) {
             post.decreaseLike();
-            postHeartRepository.delete(likePost.get());
+            postHeartRepository.delete(heartPost.get());
         } else {
             post.addLike(user);
         }

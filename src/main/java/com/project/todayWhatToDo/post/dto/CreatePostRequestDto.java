@@ -14,7 +14,7 @@ public record CreatePostRequestDto(
         PostStatus status,
         String content,
         String category,
-        Integer likeCount,
+        Integer heartCount,
         List<String> keywordList
 ) {
 
