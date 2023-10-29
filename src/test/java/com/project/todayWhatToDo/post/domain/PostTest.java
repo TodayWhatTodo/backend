@@ -3,6 +3,8 @@ package com.project.todayWhatToDo.post.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("게시물 도메인 테스트")
@@ -18,6 +20,7 @@ public class PostTest {
                 .content("내용")
                 .category("개발")
                 .status(PostStatus.ACTIVE)
+                .keywords(new ArrayList<>())
                 .title("제목")
                 .build();
 
@@ -33,7 +36,9 @@ public class PostTest {
     @Test
     public void defaultLikeCount() {
         // given
-        var post = Post.builder().build();
+        var post = Post.builder()
+                .keywords(new ArrayList<>())
+                .build();
         //when //then
         assertThat(post.getLikeCount()).isZero();
     }
