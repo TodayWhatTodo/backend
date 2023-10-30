@@ -7,14 +7,12 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record CreatePostRequestDto(
-        Long id,
+public record CreatePostRequest(
         String author,
         String title,
         PostStatus status,
         String content,
         String category,
-        Integer heartCount,
         List<String> keywordList
 ) {
 

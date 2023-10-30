@@ -6,7 +6,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record UpdatePostRequestDto(
+public record UpdatePostRequest(
         Long id,
         String author,
         String title,

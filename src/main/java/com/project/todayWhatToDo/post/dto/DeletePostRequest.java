@@ -1,6 +1,6 @@
 package com.project.todayWhatToDo.post.dto;
 
-public record DeletePostRequestDto(
+public record DeletePostRequest(
         Long id
 ) {
 
