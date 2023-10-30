@@ -4,7 +4,7 @@ import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.post.domain.Heart;
 import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;
-import com.project.todayWhatToDo.post.dto.PostHeartRequestDto;
+import com.project.todayWhatToDo.post.dto.CreateHeartRequest;
 import com.project.todayWhatToDo.post.exception.PostNotFoundException;
 import com.project.todayWhatToDo.post.repository.PostHeartRepository;
 import com.project.todayWhatToDo.post.repository.PostRepository;
@@ -36,7 +36,7 @@ public class PostHeartServiceTest extends IntegrationTest {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    PostHeartRepository likeRepository;
+    PostHeartRepository heartRepository;
 
 
     @DisplayName("게시물 좋아요 테스트")
@@ -72,12 +72,17 @@ public class PostHeartServiceTest extends IntegrationTest {
                     .build());
         }
 
+//        @AfterEach
+//        void tearDown() {
+//            postRepository.deleteAll();
+//            userRepository.deleteAll();
+//        }
 
         @DisplayName("게시물 좋아요 누르면 좋아요가 1이된다.")
         @Test
         public void increaseLike() {
             // given
-            var requestDto = PostHeartRequestDto.builder()
+            var requestDto = CreateHeartRequest.builder()
                     .userId(user.getId())
                     .postId(post.getId())
                     .build();
@@ -92,23 +97,23 @@ public class PostHeartServiceTest extends IntegrationTest {
         @Test
         public void decreaseLike() {
             // given
-            Heart heart = likeRepository.saveAndFlush(Heart.of(user, post));
+            heartRepository.saveAndFlush(Heart.of(user, post));
 
-            var requestDto = PostHeartRequestDto.builder()
+            var requestDto = CreateHeartRequest.builder()
                     .userId(user.getId())
                     .postId(post.getId())
                     .build();
             // then
-            postHeartService.heartPost(requestDto);
+            Post result = postHeartService.heartPost(requestDto);
             // then
-            assertThat(post.getHeartCount()).isEqualTo(-1);
+            assertThat(result.getHeartCount()).isEqualTo(-1);
         }
 
         @DisplayName("이미 좋아요 누른 게시글 다시 좋아요 누르면 0이 된다.")
         @Test
         public void double_click_like_button () {
             // given
-            var requestDto = PostHeartRequestDto.builder()
+            var requestDto = CreateHeartRequest.builder()
                     .userId(user.getId())
                     .postId(post.getId())
                     .build();

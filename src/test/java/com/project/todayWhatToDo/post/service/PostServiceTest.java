@@ -3,8 +3,9 @@ package com.project.todayWhatToDo.post.service;
 import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.post.domain.Post;
 import com.project.todayWhatToDo.post.domain.PostStatus;
-import com.project.todayWhatToDo.post.dto.CreatePostRequestDto;
-import com.project.todayWhatToDo.post.dto.UpdatePostRequestDto;
+import com.project.todayWhatToDo.post.dto.CreatePostRequest;
+import com.project.todayWhatToDo.post.dto.UpdatePostRequest;
+import com.project.todayWhatToDo.post.exception.PostNotFoundException;
 import com.project.todayWhatToDo.post.repository.KeywordRepository;
 import com.project.todayWhatToDo.post.repository.PostRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
@@ -36,11 +37,11 @@ public class PostServiceTest extends IntegrationTest {
     @Nested
     class postTest {
 
-        CreatePostRequestDto requestDto;
+        CreatePostRequest requestDto;
 
         @BeforeEach
         void init() {
-             requestDto = CreatePostRequestDto.builder()
+             requestDto = CreatePostRequest.builder()
                     .author("작성자")
                     .title("제목")
                     .status(PostStatus.ACTIVE)
@@ -52,7 +53,7 @@ public class PostServiceTest extends IntegrationTest {
 
 //        @AfterEach
 //        void tearDown() {
-////            postRepository.deleteAll();
+//            postRepository.deleteAll();
 //        }
 
 
@@ -63,7 +64,7 @@ public class PostServiceTest extends IntegrationTest {
             // when
             Long savedId = postService.save(requestDto);
             // then
-            Post findPost = postService.findFetchById(savedId);
+            Post findPost = postRepository.findFetchById(savedId).orElseThrow(PostNotFoundException::new);
             assertThat(savedId).isEqualTo(findPost.getId());
         }
 
@@ -74,15 +75,15 @@ public class PostServiceTest extends IntegrationTest {
         public void updatePost() {
             // given
             Long savedId = postService.save(requestDto);
-            Post findPost = postService.findFetchById(savedId);
-            UpdatePostRequestDto updateRequest = UpdatePostRequestDto.builder()
+            Post findPost = postRepository.findFetchById(savedId).orElseThrow(PostNotFoundException::new);
+            UpdatePostRequest updateRequest = UpdatePostRequest.builder()
                     .id(savedId)
                     .content("수정된 내용")
                     .keywordList(List.of("수정된 키워드1", "수정된 키워드2")).build();
             // when
             postService.update(updateRequest);
             //then
-            Post updatedPost = postService.findFetchById(findPost.getId());
+            Post updatedPost = postRepository.findFetchById(savedId).orElseThrow(PostNotFoundException::new);
             assertThat(updatedPost.getKeywords())
                     .extracting("keyword")
                     .contains("수정된 키워드1", "수정된 키워드2");

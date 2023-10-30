@@ -1,7 +1,7 @@
 package com.project.todayWhatToDo.post.domain;
 
 import com.project.todayWhatToDo.BaseTimeEntity;
-import com.project.todayWhatToDo.post.dto.UpdatePostRequestDto;
+import com.project.todayWhatToDo.post.dto.UpdatePostRequest;
 import com.project.todayWhatToDo.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -51,7 +51,7 @@ public class Post extends BaseTimeEntity {
     private List<Keyword> keywords = new ArrayList<>();
 
     @Builder
-    private Post(String title, String author, String category, String content, PostStatus status, User user, List<Heart> heartList, List<String> keywords) {
+    private Post(String title, String author, String category, String content, PostStatus status, List<String> keywords) {
         this.title = title;
         this.author = author;
         this.category = category;
@@ -68,21 +68,18 @@ public class Post extends BaseTimeEntity {
         );
     }
 
-    public void addLike(User user) {
+    public void addHeart(User user) {
         heartCount++;
         heartList.add(Heart.of(user, this));
     }
 
-    public void increaseLike() {
-        heartCount++;
-    }
-
-    public void decreaseLike() {
+    public void removeHeart(User user) {
         heartCount--;
+        heartList.remove(Heart.of(user, this));
     }
 
 
-    public void update(UpdatePostRequestDto requestDto) {
+    public void update(UpdatePostRequest requestDto) {
         if (requestDto.status() != null) this.status = requestDto.status();
         if (requestDto.content() != null) this.content = requestDto.content();
         if (requestDto.title() != null) this.title = requestDto.title();
@@ -91,10 +88,6 @@ public class Post extends BaseTimeEntity {
             keywords.clear();
             requestDto.keywordList().forEach(this::addKeyword);
         }
-    }
-
-    public void update() {
-
     }
 
 }
