@@ -1,6 +1,5 @@
 package com.project.todayWhatToDo.common.response;
 
-import com.project.todayWhatToDo.notify.dto.NotifyDto;
 import org.springframework.data.domain.Page;
 
 import java.util.Collection;
