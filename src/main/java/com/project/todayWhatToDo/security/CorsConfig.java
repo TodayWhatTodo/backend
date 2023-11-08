@@ -1,4 +1,4 @@
-package com.project.todayWhatToDo.common.security;
+package com.project.todayWhatToDo.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

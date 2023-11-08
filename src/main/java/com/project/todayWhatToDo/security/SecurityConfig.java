@@ -1,4 +1,4 @@
-package com.project.todayWhatToDo.common.security;
+package com.project.todayWhatToDo.security;
 
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
