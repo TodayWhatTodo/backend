@@ -1,9 +1,9 @@
-package com.project.todayWhatToDo.user.dto;
+package com.project.todayWhatToDo.user.dto.request;
 
 import lombok.Builder;
 
 @Builder
-public record FollowCancelRequestDto(
+public record FollowCancelRequest(
         Long followerId,
         Long followingId
 ) {

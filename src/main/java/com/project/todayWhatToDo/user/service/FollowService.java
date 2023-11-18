@@ -2,6 +2,10 @@ package com.project.todayWhatToDo.user.service;
 
 import com.project.todayWhatToDo.user.domain.Follow;
 import com.project.todayWhatToDo.user.dto.*;
+import com.project.todayWhatToDo.user.dto.request.FollowCancelRequest;
+import com.project.todayWhatToDo.user.dto.request.FollowRequest;
+import com.project.todayWhatToDo.user.dto.request.GetFollowerListRequest;
+import com.project.todayWhatToDo.user.dto.request.GetFollowingListRequest;
 import com.project.todayWhatToDo.user.exception.FollowNotFountException;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.repository.FollowRepository;
@@ -20,14 +24,14 @@ public class FollowService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
 
-    public void follow(FollowRequestDto request) {
+    public void follow(FollowRequest request) {
         var follower = userRepository.findById(request.followerId()).orElseThrow(UserNotFoundException::new);
         var user = userRepository.findById(request.userId()).orElseThrow(UserNotFoundException::new);
 
         user.addFollowing(follower);
     }
 
-    public void followCancel(FollowCancelRequestDto request) {
+    public void followCancel(FollowCancelRequest request) {
         var follow = followRepository.findByFollowerIdAndFollowingId(request.followerId(), request.followingId())
                 .orElseThrow(FollowNotFountException::new);
 
@@ -35,12 +39,12 @@ public class FollowService {
         followRepository.delete(follow);
     }
 
-    public Page<FollowDto> followingList(GetFollowingListRequestDto request, Pageable pageable) {
+    public Page<FollowDto> followingList(GetFollowingListRequest request, Pageable pageable) {
         return followRepository.findByFollowingId(request.userId(), pageable)
                 .map(Follow::toDto);
     }
 
-    public Page<FollowDto> followerList(GetFollowerListRequestDto request, Pageable pageable) {
+    public Page<FollowDto> followerList(GetFollowerListRequest request, Pageable pageable) {
         return followRepository.findByFollowerId(request.userId(), pageable)
                 .map(Follow::toDto);
     }

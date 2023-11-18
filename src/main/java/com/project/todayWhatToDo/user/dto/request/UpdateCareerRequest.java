@@ -1,11 +1,11 @@
-package com.project.todayWhatToDo.user.dto;
+package com.project.todayWhatToDo.user.dto.request;
 
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 
 @Builder
-public record UpdateCareerRequestDto(
+public record UpdateCareerRequest(
         Long careerId,
         LocalDateTime startedAt,
         LocalDateTime endedAt,

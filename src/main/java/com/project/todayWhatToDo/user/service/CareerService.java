@@ -3,8 +3,8 @@ package com.project.todayWhatToDo.user.service;
 import com.project.todayWhatToDo.user.domain.Career;
 import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
-import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
-import com.project.todayWhatToDo.user.dto.UpdateCareerRequestDto;
+import com.project.todayWhatToDo.user.dto.request.CreateCareerRequest;
+import com.project.todayWhatToDo.user.dto.request.UpdateCareerRequest;
 import com.project.todayWhatToDo.user.exception.CareerNotFoundException;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.repository.CareerRepository;
@@ -21,7 +21,7 @@ public class CareerService {
     private final UserRepository userRepository;
     private final CareerRepository careerRepository;
 
-    public void updateCareer(UpdateCareerRequestDto request, Long userId) {
+    public void updateCareer(UpdateCareerRequest request, Long userId) {
         careerRepository.findByIdAndUserId(request.careerId(), userId)
                 .orElseThrow(CareerNotFoundException::new)
                 .update(request);
@@ -31,7 +31,7 @@ public class CareerService {
         careerRepository.deleteByIdAndUserId(careerId, userId);
     }
 
-    public void createCareer(CreateCareerRequestDto request) {
+    public void createCareer(CreateCareerRequest request) {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(UserNotFoundException::new);
 

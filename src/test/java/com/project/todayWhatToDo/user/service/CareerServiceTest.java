@@ -4,8 +4,8 @@ import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.user.domain.Career;
 import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
-import com.project.todayWhatToDo.user.dto.CreateCareerRequestDto;
-import com.project.todayWhatToDo.user.dto.UpdateCareerRequestDto;
+import com.project.todayWhatToDo.user.dto.request.CreateCareerRequest;
+import com.project.todayWhatToDo.user.dto.request.UpdateCareerRequest;
 import com.project.todayWhatToDo.user.repository.CareerRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.assertj.core.groups.Tuple;
@@ -50,7 +50,7 @@ public class CareerServiceTest extends IntegrationTest {
 
         var startedAt = LocalDateTime.of(2000, 10, 10, 10, 10, 10);
         var endedAt = LocalDateTime.of(2001, 10, 10, 10, 10, 10);
-        var request = new CreateCareerRequestDto(user.getId(), "todo company", "test address", "my first job", startedAt, endedAt, "대리");
+        var request = new CreateCareerRequest(user.getId(), "todo company", "test address", "my first job", startedAt, endedAt, "대리");
         //when
         careerService.createCareer(request);
         //then
@@ -85,7 +85,7 @@ public class CareerServiceTest extends IntegrationTest {
                         .build())
                 .build());
 
-        var req = UpdateCareerRequestDto.builder()
+        var req = UpdateCareerRequest.builder()
                 .startedAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
                 .endedAt(LocalDateTime.of(2023, 1, 1, 0, 0, 0))
                 .careerId(career.getId())

@@ -1,6 +1,6 @@
 package com.project.todayWhatToDo.user.domain;
 
-import com.project.todayWhatToDo.user.dto.UpdateCareerRequestDto;
+import com.project.todayWhatToDo.user.dto.request.UpdateCareerRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ public class CareerTest {
         @Test
         public void updateIntroduction() {
             //given
-            var request = UpdateCareerRequestDto.builder()
+            var request = UpdateCareerRequest.builder()
                     .introduction("정말 좋은 회사야 도망쳐..")
                     .build();
             //when
@@ -46,7 +46,7 @@ public class CareerTest {
         public void updateStartedAt() {
             //given
             LocalDateTime after = LocalDateTime.of(1000, 1, 1, 1, 1, 1);
-            var request = UpdateCareerRequestDto.builder()
+            var request = UpdateCareerRequest.builder()
                     .startedAt(after)
                     .build();
             //when
@@ -60,7 +60,7 @@ public class CareerTest {
         public void updateStartedAtFail() {
             //given
             LocalDateTime after = LocalDateTime.of(2111, 1, 1, 1, 1, 1);
-            var request = UpdateCareerRequestDto.builder()
+            var request = UpdateCareerRequest.builder()
                     .startedAt(after)
                     .build();
             //when //then
@@ -73,7 +73,7 @@ public class CareerTest {
         public void updateEndedAt() {
             //given
             LocalDateTime after = LocalDateTime.of(2100, 1, 1, 1, 1, 1);
-            var request = UpdateCareerRequestDto.builder()
+            var request = UpdateCareerRequest.builder()
                     .endedAt(after)
                     .build();
             //when
@@ -87,7 +87,7 @@ public class CareerTest {
         public void updateEndedAtFail() {
             //given
             LocalDateTime after = LocalDateTime.of(1000, 1, 1, 1, 1, 1);
-            var request = UpdateCareerRequestDto.builder()
+            var request = UpdateCareerRequest.builder()
                     .endedAt(after)
                     .build();
             //when //then
@@ -98,7 +98,7 @@ public class CareerTest {
         @Test
         public void nonUpdate() {
             //given
-            var request = UpdateCareerRequestDto.builder().build();
+            var request = UpdateCareerRequest.builder().build();
             //when
             career.update(request);
             //then

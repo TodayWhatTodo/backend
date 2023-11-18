@@ -1,9 +1,9 @@
-package com.project.todayWhatToDo.user.dto;
+package com.project.todayWhatToDo.user.dto.response;
 
 import lombok.Builder;
 
 @Builder
-public record ProfileResponseDto(
+public record ProfileResponse(
         String profileImagePath,
         Integer followerCount,
         Integer followingCount,

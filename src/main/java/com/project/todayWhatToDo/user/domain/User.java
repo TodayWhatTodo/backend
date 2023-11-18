@@ -1,8 +1,8 @@
 package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
-import com.project.todayWhatToDo.user.dto.ProfileResponseDto;
-import com.project.todayWhatToDo.user.dto.UpdateUserSettingRequestDto;
+import com.project.todayWhatToDo.user.dto.response.ProfileResponse;
+import com.project.todayWhatToDo.user.dto.request.UpdateUserSettingRequest;
 import com.project.todayWhatToDo.user.dto.UserSession;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -145,8 +145,8 @@ public class User {
         followingCount--;
     }
 
-    public ProfileResponseDto toProfile() {
-        return ProfileResponseDto.builder()
+    public ProfileResponse toProfile() {
+        return ProfileResponse.builder()
                 .profileImagePath(imagePath)
                 .company(job.getCompanyName())
                 .position(job.getPosition())
@@ -161,7 +161,7 @@ public class User {
         authority = QUIT;
     }
 
-    public void setting(UpdateUserSettingRequestDto request) {
+    public void setting(UpdateUserSettingRequest request) {
         isAcceptAlarm = request.isAcceptAlarm();
     }
 }

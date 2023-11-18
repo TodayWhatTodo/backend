@@ -1,7 +1,7 @@
 package com.project.todayWhatToDo.user.domain;
 
 import com.project.todayWhatToDo.security.Authority;
-import com.project.todayWhatToDo.user.dto.UpdateUserSettingRequestDto;
+import com.project.todayWhatToDo.user.dto.request.UpdateUserSettingRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -315,7 +315,7 @@ public class UserTest {
                 .name("홍길동")
                 .build();
 
-        var request = UpdateUserSettingRequestDto.builder()
+        var request = UpdateUserSettingRequest.builder()
                 .isAcceptAlarm(acceptAlarmSetting)
                 .build();
         // when

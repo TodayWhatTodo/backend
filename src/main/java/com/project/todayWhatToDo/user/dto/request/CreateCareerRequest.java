@@ -1,8 +1,8 @@
-package com.project.todayWhatToDo.user.dto;
+package com.project.todayWhatToDo.user.dto.request;
 
 import java.time.LocalDateTime;
 
-public record CreateCareerRequestDto(
+public record CreateCareerRequest(
         Long userId,
         String name,
         String address,

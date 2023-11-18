@@ -5,6 +5,10 @@ import com.project.todayWhatToDo.user.domain.Follow;
 import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.*;
+import com.project.todayWhatToDo.user.dto.request.FollowCancelRequest;
+import com.project.todayWhatToDo.user.dto.request.FollowRequest;
+import com.project.todayWhatToDo.user.dto.request.GetFollowerListRequest;
+import com.project.todayWhatToDo.user.dto.request.GetFollowingListRequest;
 import com.project.todayWhatToDo.user.repository.FollowRepository;
 import com.project.todayWhatToDo.user.repository.UserRepository;
 import org.assertj.core.groups.Tuple;
@@ -86,7 +90,7 @@ public class FollowServiceTest extends IntegrationTest {
         @Test
         public void follow() {
             //given
-            var request = FollowRequestDto.builder()
+            var request = FollowRequest.builder()
                     .followerId(userB.getId())
                     .userId(userA.getId())
                     .build();
@@ -106,7 +110,7 @@ public class FollowServiceTest extends IntegrationTest {
                     .follower(userB)
                     .build());
 
-            var request = FollowCancelRequestDto.builder()
+            var request = FollowCancelRequest.builder()
                     .followerId(userB.getId())
                     .followingId(userA.getId())
                     .build();
@@ -125,7 +129,7 @@ public class FollowServiceTest extends IntegrationTest {
             follow(user, userB);
             follow(user, userC);
 
-            var request = GetFollowingListRequestDto.builder()
+            var request = GetFollowingListRequest.builder()
                     .userId(user.getId())
                     .build();
 
@@ -149,7 +153,7 @@ public class FollowServiceTest extends IntegrationTest {
             follow(userA, follower);
             follow(userC, follower);
 
-            var request = GetFollowerListRequestDto.builder()
+            var request = GetFollowerListRequest.builder()
                     .userId(follower.getId())
                     .build();
 
@@ -177,7 +181,7 @@ public class FollowServiceTest extends IntegrationTest {
         @Test
         public void countFollowingWithFollow() {
             // given
-            followService.follow(FollowRequestDto.builder()
+            followService.follow(FollowRequest.builder()
                     .userId(userA.getId())
                     .followerId(userC.getId())
                     .build());
@@ -200,7 +204,7 @@ public class FollowServiceTest extends IntegrationTest {
         @Test
         public void countFollowerWithFollow() {
             // given
-            followService.follow(FollowRequestDto.builder()
+            followService.follow(FollowRequest.builder()
                     .userId(userC.getId())
                     .followerId(userA.getId())
                     .build());

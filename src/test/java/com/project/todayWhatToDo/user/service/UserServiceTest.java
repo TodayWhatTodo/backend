@@ -4,9 +4,9 @@ import com.project.todayWhatToDo.IntegrationTest;
 import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
-import com.project.todayWhatToDo.user.dto.CreateUserRequestDto;
-import com.project.todayWhatToDo.user.dto.LoginRequestDto;
-import com.project.todayWhatToDo.user.dto.ModifyUserRequestDto;
+import com.project.todayWhatToDo.user.dto.request.CreateUserRequest;
+import com.project.todayWhatToDo.user.dto.request.LoginRequest;
+import com.project.todayWhatToDo.user.dto.request.ModifyUserRequest;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
 import com.project.todayWhatToDo.user.login.LoginApiProvider;
@@ -88,7 +88,7 @@ public class UserServiceTest extends IntegrationTest {
                     .authority(COMMON)
                     .build());
 
-            var request = ModifyUserRequestDto.builder()
+            var request = ModifyUserRequest.builder()
                     .id(user.getId())
                     .nickname("after nickname")
                     .build();
@@ -116,7 +116,7 @@ public class UserServiceTest extends IntegrationTest {
                             .build())
                     .build());
 
-            var request = ModifyUserRequestDto.builder()
+            var request = ModifyUserRequest.builder()
                     .id(user.getId())
                     .introduction("after self introduction")
                     .build();
@@ -147,7 +147,7 @@ public class UserServiceTest extends IntegrationTest {
                     .authority(Authority.COMMON)
                     .build());
 
-            var request = ModifyUserRequestDto.builder()
+            var request = ModifyUserRequest.builder()
                     .id(user.getId())
                     .imagePath("after image path")
                     .build();
@@ -176,7 +176,7 @@ public class UserServiceTest extends IntegrationTest {
                     .authority(COMMON)
                     .build());
 
-            var request = ModifyUserRequestDto.builder()
+            var request = ModifyUserRequest.builder()
                     .id(user.getId())
                     .companyName("bye company")
                     .build();
@@ -207,7 +207,7 @@ public class UserServiceTest extends IntegrationTest {
                     .authority(COMMON)
                     .build());
 
-            var request = ModifyUserRequestDto.builder()
+            var request = ModifyUserRequest.builder()
                     .id(user.getId())
                     .build();
             //when
@@ -239,7 +239,7 @@ public class UserServiceTest extends IntegrationTest {
                         .build())
                 .build());
 
-        var request = new LoginRequestDto("kakao", "test token");
+        var request = new LoginRequest("kakao", "test token");
 
         //when //then
         var session = userService.login(request);
@@ -265,7 +265,7 @@ public class UserServiceTest extends IntegrationTest {
                         .build())
                 .build());
 
-        var request = new LoginRequestDto("kakao", "test token");
+        var request = new LoginRequest("kakao", "test token");
         //when //then
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(UserNotFoundException.class);
@@ -289,7 +289,7 @@ public class UserServiceTest extends IntegrationTest {
     @Test
     public void joinUser() {
         //given
-        var request = CreateUserRequestDto.builder()
+        var request = CreateUserRequest.builder()
                 .token("test token")
                 .nickname("hello world")
                 .companyName("hello company")

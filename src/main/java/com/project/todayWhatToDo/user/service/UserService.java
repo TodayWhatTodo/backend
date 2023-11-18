@@ -4,6 +4,10 @@ import com.project.todayWhatToDo.security.UserSecurityInfo;
 import com.project.todayWhatToDo.user.domain.Job;
 import com.project.todayWhatToDo.user.domain.User;
 import com.project.todayWhatToDo.user.dto.*;
+import com.project.todayWhatToDo.user.dto.request.CreateUserRequest;
+import com.project.todayWhatToDo.user.dto.request.LoginRequest;
+import com.project.todayWhatToDo.user.dto.request.ModifyUserRequest;
+import com.project.todayWhatToDo.user.dto.response.ProfileResponse;
 import com.project.todayWhatToDo.user.exception.UserNotFoundException;
 import com.project.todayWhatToDo.user.login.LoginApiManager;
 import com.project.todayWhatToDo.user.login.handler.LoginResponseHandler;
@@ -39,7 +43,7 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    public UserSession login(LoginRequestDto request) {
+    public UserSession login(LoginRequest request) {
 
         var response = getUserInfo(request.provider(), request.token());
 
@@ -57,7 +61,7 @@ public class UserService implements UserDetailsService {
                 .getUserInfo(restTemplate, token);
     }
 
-    public UserSession joinUser(CreateUserRequestDto request) {
+    public UserSession joinUser(CreateUserRequest request) {
         var response = getUserInfo(request.provider(), request.token());
 
         var name = response.getName();
@@ -76,7 +80,7 @@ public class UserService implements UserDetailsService {
                 .toSession();
     }
 
-    public void modifyUserInfo(ModifyUserRequestDto request) {
+    public void modifyUserInfo(ModifyUserRequest request) {
 
         User user = userRepository.findById(request.id())
                 .orElseThrow(UserNotFoundException::new);
@@ -91,7 +95,7 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public ProfileResponseDto getProfile(Long userId) {
+    public ProfileResponse getProfile(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new)
                 .toProfile();

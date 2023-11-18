@@ -1,6 +1,6 @@
 package com.project.todayWhatToDo.user.domain;
 
-import com.project.todayWhatToDo.user.dto.UpdateCareerRequestDto;
+import com.project.todayWhatToDo.user.dto.request.UpdateCareerRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,7 +38,7 @@ public class Career {
         this.endedAt = endedAt;
     }
 
-    public void update(UpdateCareerRequestDto request) {
+    public void update(UpdateCareerRequest request) {
         if (request.startedAt() != null) startedAt = request.startedAt();
         if (request.endedAt() != null) endedAt = request.endedAt();
         if (request.introduction() != null) introduction = request.introduction();
