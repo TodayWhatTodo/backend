@@ -16,7 +16,19 @@ spring:
         globally_quoted_identifiers: true
     hibernate:
       ddl-auto: create
+  messages:
+    encoding: UTF-8
 
 logging:
   level:
     org.hibernate.type.descriptor.sql: trace
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+api:
+  message:
+    success:

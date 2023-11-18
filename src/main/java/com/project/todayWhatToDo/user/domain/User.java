@@ -154,6 +154,7 @@ public class User {
                 .followingCount(followingCount)
                 .introduction(introduction)
                 .nickname(nickname)
+                .userId(id)
                 .build();
     }
 

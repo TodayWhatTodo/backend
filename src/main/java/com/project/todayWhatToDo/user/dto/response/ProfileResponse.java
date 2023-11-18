@@ -10,6 +10,7 @@ public record ProfileResponse(
         String nickname,
         String introduction,
         String position,
-        String company
+        String company,
+        Long userId
 ) {
 }

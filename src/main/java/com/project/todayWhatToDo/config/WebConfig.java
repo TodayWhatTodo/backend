@@ -1,4 +1,4 @@
-package com.project.todayWhatToDo;
+package com.project.todayWhatToDo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

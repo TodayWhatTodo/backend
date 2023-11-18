@@ -31,8 +31,9 @@ public class SecurityConfig {
                     c.disable();
                 })
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/v1/user/login", "/h2-console/**").permitAll()
-                                .requestMatchers("/**").permitAll()
+                                .requestMatchers(antMatcher("/v1/user/login")).permitAll()
+                                .requestMatchers(antMatcher("/h2-console/**")).permitAll()
+                                .requestMatchers(antMatcher("/**")).permitAll()
                                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
 //                        .anyRequest().authenticated()
                 )
