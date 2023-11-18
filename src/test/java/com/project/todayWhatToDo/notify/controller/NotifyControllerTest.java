@@ -1,13 +1,13 @@
 package com.project.todayWhatToDo.notify.controller;
 
 import com.project.todayWhatToDo.RestDocsTest;
-import com.project.todayWhatToDo.security.JwtToken;
 import com.project.todayWhatToDo.notify.dto.NotifyDto;
 import com.project.todayWhatToDo.notify.service.NotifyService;
+import com.project.todayWhatToDo.security.Authority;
 import com.project.todayWhatToDo.security.JwtService;
+import com.project.todayWhatToDo.security.JwtToken;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -15,9 +15,9 @@ import org.springframework.data.domain.PageRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -30,8 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("알림 API")
 class NotifyControllerTest extends RestDocsTest {
 
-    @Autowired
-    NotifyController notifyController;
     @MockBean
     NotifyService notifyService;
     @MockBean
@@ -46,13 +44,14 @@ class NotifyControllerTest extends RestDocsTest {
         given(notifyService.getNotifies(any(), any()))
                 .willReturn(new PageImpl<>(result, PageRequest.of(0, 5), 10));
 
-        given(jwtService.getToken(any()))
-                .willReturn(new JwtToken(1L));
+        given(jwtService.getUserInfo(any()))
+                .willReturn(new JwtToken(1L, "testuser", Authority.COMMON));
 
         // when // then
         mockMvc.perform(get("/api/v1/alarm/list")
                         .queryParam("page", "0")
                         .queryParam("size", "5")
+                        .header("Authorization", "Bearer ...")
                 )
                 .andDo(print())
                 .andExpectAll(

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtService {
     // todo
-    public JwtToken getToken(String token) {
-        return new JwtToken(1L);
+    public JwtToken getUserInfo(String token) {
+        return new JwtToken(1L, "testuser", Authority.COMMON);
     }
 }
