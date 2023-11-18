@@ -29,9 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("security config run");
         return http
-                .cors(c -> {
-                    c.disable();
-                })
+                .cors(c -> c.disable())
                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers(antMatcher("/v1/user/login")).permitAll()
                                 .requestMatchers(antMatcher("/h2-console/**")).permitAll()
@@ -46,7 +44,7 @@ public class SecurityConfig {
                 .build();
     }
 
-    public JwtAuthorizationFilter jwtAuthorizationFilter(){
+    public JwtAuthorizationFilter jwtAuthorizationFilter() {
         return new JwtAuthorizationFilter(jwtService);
     }
 }

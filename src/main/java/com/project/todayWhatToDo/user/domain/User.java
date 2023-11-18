@@ -146,16 +146,16 @@ public class User {
     }
 
     public ProfileResponse toProfile() {
-        return ProfileResponse.builder()
-                .profileImagePath(imagePath)
-                .company(job.getCompanyName())
-                .position(job.getPosition())
-                .followerCount(followerCount)
-                .followingCount(followingCount)
-                .introduction(introduction)
-                .nickname(nickname)
-                .userId(id)
-                .build();
+        return new ProfileResponse(
+                imagePath,
+                followerCount,
+                followingCount,
+                nickname,
+                introduction,
+                job.getPosition(),
+                job.getCompanyName(),
+                id
+        );
     }
 
     public void quit() {
